@@ -1,0 +1,73 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-api:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: packoptimize
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: packoptimize_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: packoptimize-api
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packoptimize-api/package-lock.json
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: postgresql://packoptimize:test_password@localhost:5433/packoptimize_test
+      - run: npm run lint
+      - run: npm run test -- --coverage --forceExit
+        env:
+          DATABASE_URL: postgresql://packoptimize:test_password@localhost:5433/packoptimize_test
+          TEST_DATABASE_URL: postgresql://packoptimize:test_password@localhost:5433/packoptimize_test
+          JWT_SECRET: test-jwt-secret
+          REDIS_URL: redis://localhost:6379
+      - run: npm run build
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packoptimize-web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: packoptimize-web/package-lock.json
+      - run: npm ci
+      - run: npm run build

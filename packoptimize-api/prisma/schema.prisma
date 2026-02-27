@@ -1,0 +1,298 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Plan {
+  FREE
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum Role {
+  ADMIN
+  OPERATOR
+  VIEWER
+}
+
+enum OptimizationStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum CompatibilityRule {
+  INCOMPATIBLE
+  MUST_SHIP_TOGETHER
+}
+
+enum PackagingCategory {
+  BOX
+  POLY_MAILER
+  PADDED_ENVELOPE
+  TUBE
+  CUSTOM
+}
+
+enum Carrier {
+  FEDEX
+  UPS
+  USPS
+}
+
+enum UsageType {
+  OPTIMIZATION_RUN
+  API_CALL
+}
+
+model Tenant {
+  id               String   @id @default(uuid())
+  name             String
+  slug             String   @unique
+  plan             Plan     @default(FREE)
+  settings         Json     @default("{}")
+  isActive         Boolean  @default(true)
+  stripeCustomerId     String?  @unique
+  stripeSubscriptionId String?
+  createdAt            DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  users               User[]
+  items               Item[]
+  boxTypes            BoxType[]
+  packagingTypes      PackagingType[]
+  itemCompatibilities ItemCompatibility[]
+  insertMaterials     InsertMaterial[]
+  optimizationRuns    OptimizationRun[]
+  apiKeys             ApiKey[]
+  usageRecords        UsageRecord[]
+  savingsLogs         SavingsLog[]
+}
+
+model User {
+  id           String    @id @default(uuid())
+  tenantId     String
+  email        String
+  passwordHash String
+  role         Role      @default(OPERATOR)
+  lastLoginAt  DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  apiKeys          ApiKey[]
+  optimizationRuns OptimizationRun[]
+
+  @@unique([tenantId, email])
+  @@index([tenantId])
+}
+
+model Item {
+  id             String   @id @default(uuid())
+  tenantId       String
+  sku            String
+  name           String
+  width          Float
+  height         Float
+  depth          Float
+  weight         Float
+  isFragile      Boolean  @default(false)
+  canRotate      Boolean  @default(true)
+  maxStackWeight Float?
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, sku])
+  @@index([tenantId])
+}
+
+model BoxType {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  innerWidth    Float
+  innerHeight   Float
+  innerDepth    Float
+  outerWidth    Float
+  outerHeight   Float
+  outerDepth    Float
+  wallThickness Float
+  boxWeight     Float
+  maxWeight     Float
+  cost          Float
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant              Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  optimizationResults OptimizationResult[]
+
+  @@index([tenantId])
+}
+
+model PackagingType {
+  id        String            @id @default(uuid())
+  tenantId  String
+  name      String
+  category  PackagingCategory
+  maxWidth  Float?
+  maxHeight Float?
+  maxDepth  Float?
+  maxWeight Float?
+  cost      Float
+  isActive  Boolean           @default(true)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model ItemCompatibility {
+  id        String            @id @default(uuid())
+  tenantId  String
+  itemIdA   String
+  itemIdB   String
+  rule      CompatibilityRule
+  createdAt DateTime          @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, itemIdA, itemIdB])
+  @@index([tenantId])
+}
+
+model InsertMaterial {
+  id            String   @id @default(uuid())
+  tenantId      String
+  name          String
+  width         Float
+  height        Float
+  depth         Float
+  weight        Float
+  alwaysInclude Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model OptimizationRun {
+  id          String             @id @default(uuid())
+  tenantId    String
+  userId      String?
+  status      OptimizationStatus @default(PENDING)
+  algorithm   String             @default("EB-AFIT")
+  parameters  Json               @default("{}")
+  duration    Int?
+  errorMsg    String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime           @default(now())
+
+  tenant  Tenant              @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user    User?               @relation(fields: [userId], references: [id])
+  results OptimizationResult[]
+  savings SavingsLog?
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+}
+
+model OptimizationResult {
+  id                String   @id @default(uuid())
+  optimizationRunId String
+  boxTypeId         String?
+  boxIndex          Int
+  utilization       Float
+  placements        Json
+  voidFillVolume    Float?
+  totalWeight       Float?
+  dimWeight         Float?
+  billableWeight    Float?
+  surcharges        Json     @default("[]")
+  packInstructions  Json     @default("[]")
+  createdAt         DateTime @default(now())
+
+  optimizationRun OptimizationRun @relation(fields: [optimizationRunId], references: [id], onDelete: Cascade)
+  boxType         BoxType?        @relation(fields: [boxTypeId], references: [id])
+}
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  tenantId    String
+  userId      String
+  keyHash     String    @unique
+  keyPrefix   String
+  permissions String[]  @default(["optimize", "items:read", "boxes:read"])
+  expiresAt   DateTime?
+  lastUsedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id])
+
+  @@index([tenantId])
+  @@index([keyHash])
+}
+
+model UsageRecord {
+  id            String    @id @default(uuid())
+  tenantId      String
+  type          UsageType
+  quantity      Int       @default(1)
+  billingPeriod String
+  metadata      Json      @default("{}")
+  createdAt     DateTime  @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, billingPeriod])
+}
+
+model SavingsLog {
+  id                String   @id @default(uuid())
+  tenantId          String
+  optimizationRunId String   @unique
+  naiveBoxCost      Float
+  optimizedCost     Float
+  savingsAmount     Float
+  createdAt         DateTime @default(now())
+
+  tenant          Tenant          @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  optimizationRun OptimizationRun @relation(fields: [optimizationRunId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+}
+
+model CarrierConstraint {
+  id                     String   @id @default(uuid())
+  carrier                Carrier
+  maxLengthInches        Float
+  maxGirthInches         Float
+  maxWeightLbs           Float
+  dimDivisor             Int
+  ahsCubicThreshold      Float?
+  oversizeCubicThreshold Float?
+  ahsLengthThreshold     Float?
+  ahsWidthThreshold      Float?
+  ahsMinBillableWeight   Float?
+  surchargeRates         Json     @default("{}")
+  effectiveDate          DateTime
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([carrier, effectiveDate])
+  @@index([carrier])
+}
