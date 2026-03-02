@@ -55,6 +55,7 @@ import { RolesGuard } from './common/guards/roles.guard';
         type: 'single' as const,
         url: configService.get<string>('REDIS_URL', 'redis://localhost:6379'),
         options: {
+          lazyConnect: true,
           connectTimeout: 10000,
           maxRetriesPerRequest: 3,
           retryStrategy: (times: number) => (times > 3 ? null : Math.min(times * 500, 3000)),
