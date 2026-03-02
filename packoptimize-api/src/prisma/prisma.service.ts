@@ -1,25 +1,13 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { PrismaClient } from '@prisma/client';
-import { PrismaPg } from '@prisma/adapter-pg';
-import { Pool } from 'pg';
 import { ClsService } from 'nestjs-cls';
 
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaService.name);
-  private readonly pool: Pool;
 
-  constructor(
-    private readonly cls: ClsService,
-    configService: ConfigService,
-  ) {
-    const pool = new Pool({
-      connectionString: configService.get<string>('DATABASE_URL'),
-    });
-    const adapter = new PrismaPg(pool);
-    super({ adapter });
-    this.pool = pool;
+  constructor(private readonly cls: ClsService) {
+    super();
   }
 
   async onModuleInit() {
@@ -29,7 +17,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   async onModuleDestroy() {
     await this.$disconnect();
-    await this.pool.end();
   }
 
   /**
@@ -56,15 +43,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 @Injectable()
 export class PrismaServiceWithoutTenant extends PrismaClient implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PrismaServiceWithoutTenant.name);
-  private readonly pool: Pool;
 
-  constructor(configService: ConfigService) {
-    const pool = new Pool({
-      connectionString: configService.get<string>('DATABASE_URL'),
-    });
-    const adapter = new PrismaPg(pool);
-    super({ adapter });
-    this.pool = pool;
+  constructor() {
+    super();
   }
 
   async onModuleInit() {
@@ -74,6 +55,5 @@ export class PrismaServiceWithoutTenant extends PrismaClient implements OnModule
 
   async onModuleDestroy() {
     await this.$disconnect();
-    await this.pool.end();
   }
 }
