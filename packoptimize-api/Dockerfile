@@ -17,4 +17,4 @@ COPY --from=build /app/prisma.config.js ./prisma.config.js
 COPY --from=build /app/prisma ./prisma
 EXPOSE 3000
 USER node
-CMD ["dumb-init", "node", "dist/main.js"]
+CMD ["sh", "-c", "npx prisma db push || true; exec node dist/main.js"]
