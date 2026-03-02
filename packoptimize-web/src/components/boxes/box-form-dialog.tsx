@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { SpinnerGap } from "@phosphor-icons/react";
 import type { BoxType } from "@/types/api";
 
 const positiveNum = z.union([z.string(), z.number()]).transform(Number).pipe(z.number().positive());
@@ -119,7 +119,7 @@ export function BoxFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{box ? "Edit Box Type" : "Add Box Type"}</DialogTitle>
         </DialogHeader>
@@ -138,7 +138,7 @@ export function BoxFormDialog({
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <FormField
                 control={form.control}
                 name="innerWidth"
@@ -192,11 +192,11 @@ export function BoxFormDialog({
                 </FormItem>
               )}
             />
-            <div className="rounded-md bg-muted p-3">
+            <div className="rounded-2xl bg-[#F5F6F8] border border-gray-100 p-3">
               <p className="text-sm font-medium text-muted-foreground">Calculated Outer Dims</p>
               <p className="text-sm">{outerWidth} x {outerHeight} x {outerDepth} mm</p>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2 sm:gap-4">
               <FormField
                 control={form.control}
                 name="boxWeight"
@@ -250,11 +250,11 @@ export function BoxFormDialog({
               )}
             />
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button type="button" variant="outline" className="rounded-full" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isPending}>
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full" disabled={isPending}>
+                {isPending && <SpinnerGap size={16} className="mr-2 animate-spin" />}
                 {box ? "Update" : "Create"}
               </Button>
             </div>

@@ -36,10 +36,10 @@ export function PackedBoxScene({ packedBox, offsetX = 0 }: PackedBoxSceneProps) 
         zIndexRange={[0, 0]}
       >
         <div className="text-center whitespace-nowrap">
-          <p className="text-xs font-semibold text-slate-700">
+          <p className="text-xs font-semibold text-[#0B4228]">
             Box {boxIndex}: {boxName}
           </p>
-          <p className="text-xs text-slate-500 flex items-center justify-center gap-1">
+          <p className="text-xs text-[#8B95A5] flex items-center justify-center gap-1">
             <span
               className="inline-block h-2 w-2 rounded-full"
               style={{ backgroundColor: utilizationColor }}

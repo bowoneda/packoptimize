@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { LogOut, User, Menu } from "lucide-react";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { MobileSidebar } from "./mobile-sidebar";
+import { SignOut, User } from "@phosphor-icons/react";
 
 const pageTitles: Record<string, string> = {
   "/dashboard": "Dashboard",
@@ -23,11 +21,14 @@ const pageTitles: Record<string, string> = {
   "/optimize": "Optimize",
   "/carrier-rules": "Carrier Rules",
   "/api-keys": "API Keys",
+  "/api-docs": "API Documentation",
+  "/profile": "Profile",
   "/settings": "Settings",
 };
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
   const user = useAuthStore((s) => s.user);
   const { logout } = useAuth();
 
@@ -40,49 +41,35 @@ export function Header() {
     : "U";
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-border bg-card/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+    <header className="sticky top-0 z-20 hidden md:flex h-14 items-center justify-between border-b border-[#E8EAED] bg-white/95 px-6 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <h1 className="text-lg font-bold text-[#0B4228]">{title}</h1>
       <div className="flex items-center gap-3">
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[260px] p-0">
-            <MobileSidebar />
-          </SheetContent>
-        </Sheet>
-        <h1 className="text-lg font-semibold">{title}</h1>
-      </div>
-      <div className="flex items-center gap-3">
-        <span className="hidden text-sm text-muted-foreground sm:block">
-          {user?.tenantName}
-        </span>
+        <span className="text-sm text-[#8B95A5]">{user?.tenantName}</span>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-blue-100 text-blue-700 text-xs">
+                <AvatarFallback className="bg-[#E8EAED] text-[#0B4228] text-xs font-semibold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuContent align="end" className="w-56 rounded-2xl">
             <div className="flex items-center gap-2 p-2">
               <div className="flex flex-col space-y-0.5">
                 <p className="text-sm font-medium">{user?.email}</p>
-                <p className="text-xs text-muted-foreground">{user?.role}</p>
+                <p className="text-xs text-[#8B95A5]">{user?.role}</p>
               </div>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => {}}>
-              <User className="mr-2 h-4 w-4" />
+            <DropdownMenuItem onClick={() => router.push("/profile")}>
+              <User size={16} className="mr-2" />
               Profile
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={logout}>
-              <LogOut className="mr-2 h-4 w-4" />
+              <SignOut size={16} className="mr-2" />
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>

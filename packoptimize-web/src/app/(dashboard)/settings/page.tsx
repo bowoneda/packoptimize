@@ -29,7 +29,7 @@ import {
 import api from "@/lib/api";
 import { useAuthStore } from "@/stores/auth-store";
 import type { Tenant, BillingUsage } from "@/types/api";
-import { Trash2, CreditCard, ArrowUpRight, ShoppingCart, Copy, Check } from "lucide-react";
+import { Trash, CreditCard, ArrowSquareOut, ShoppingCart, Copy, Check } from "@phosphor-icons/react";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
@@ -121,14 +121,14 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Settings</h1>
         <p className="text-sm text-muted-foreground">
           Manage your organization settings and preferences
         </p>
       </div>
 
       {/* Tenant Info */}
-      <Card>
+      <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
         <CardHeader>
           <CardTitle className="text-base">Organization</CardTitle>
         </CardHeader>
@@ -140,7 +140,7 @@ export default function SettingsPage() {
             </div>
           ) : (
             <>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label className="text-muted-foreground">Organization Name</Label>
                   <p className="text-sm font-medium">{tenant?.name ?? user?.tenantName ?? "—"}</p>
@@ -152,7 +152,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Label className="text-muted-foreground">Plan</Label>
-                <Badge variant="secondary">{tenant?.plan ?? "Free"}</Badge>
+                <Badge variant="secondary" className="rounded-full">{tenant?.plan ?? "Free"}</Badge>
               </div>
             </>
           )}
@@ -160,10 +160,10 @@ export default function SettingsPage() {
       </Card>
 
       {/* Billing & Usage */}
-      <Card>
+      <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <CreditCard className="h-4 w-4" />
+            <CreditCard size={16} />
             <CardTitle className="text-base">Billing & Usage</CardTitle>
           </div>
           <CardDescription>
@@ -185,7 +185,7 @@ export default function SettingsPage() {
                   <span className="text-sm text-muted-foreground">Current Plan:</span>
                   <Badge
                     variant={isPaidPlan ? "default" : "secondary"}
-                    className={isPaidPlan ? "bg-blue-600" : ""}
+                    className={isPaidPlan ? "bg-[#0B4228] rounded-full" : "rounded-full"}
                   >
                     {billingUsage.plan}
                   </Badge>
@@ -229,26 +229,27 @@ export default function SettingsPage() {
               )}
 
               {/* Actions */}
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 {!isPaidPlan ? (
                   <>
                     <Button
                       size="sm"
-                      className="bg-blue-600 hover:bg-blue-700"
+                      className="w-full sm:w-auto text-xs sm:text-sm bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300"
                       onClick={() => upgradeCheckout.mutate("STARTER")}
                       disabled={upgradeCheckout.isPending}
                     >
                       {upgradeCheckout.isPending ? "Loading..." : "Upgrade to Starter — $99/mo"}
-                      {!upgradeCheckout.isPending && <ArrowUpRight className="ml-1 h-3 w-3" />}
+                      {!upgradeCheckout.isPending && <ArrowSquareOut size={12} className="ml-1" />}
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
+                      className="w-full sm:w-auto text-xs sm:text-sm"
                       onClick={() => upgradeCheckout.mutate("GROWTH")}
                       disabled={upgradeCheckout.isPending}
                     >
                       Growth — $249/mo
-                      <ArrowUpRight className="ml-1 h-3 w-3" />
+                      <ArrowSquareOut size={12} className="ml-1" />
                     </Button>
                   </>
                 ) : (
@@ -259,7 +260,7 @@ export default function SettingsPage() {
                     disabled={manageSubscription.isPending}
                   >
                     {manageSubscription.isPending ? "Loading..." : "Manage Subscription"}
-                    {!manageSubscription.isPending && <ArrowUpRight className="ml-1 h-3 w-3" />}
+                    {!manageSubscription.isPending && <ArrowSquareOut size={12} className="ml-1" />}
                   </Button>
                 )}
               </div>
@@ -273,10 +274,10 @@ export default function SettingsPage() {
       </Card>
 
       {/* Shopify Integration */}
-      <Card>
+      <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <ShoppingCart className="h-4 w-4" />
+            <ShoppingCart size={16} />
             <CardTitle className="text-base">Shopify Integration</CardTitle>
           </div>
           <CardDescription>
@@ -291,7 +292,7 @@ export default function SettingsPage() {
           <div className="space-y-2">
             <Label className="text-muted-foreground">Webhook URL</Label>
             <div className="flex items-center gap-2">
-              <code className="flex-1 rounded bg-muted px-3 py-2 text-xs font-mono">
+              <code className="flex-1 bg-[#F5F6F8] rounded-xl px-3 py-2 text-[10px] sm:text-xs font-mono break-all">
                 {typeof window !== "undefined" ? window.location.origin : ""}/api/proxy/v1/integrations/shopify/rates
               </code>
               <Button
@@ -305,7 +306,7 @@ export default function SettingsPage() {
                   setTimeout(() => setCopied(false), 2000);
                 }}
               >
-                {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+                {copied ? <Check size={12} /> : <Copy size={12} />}
               </Button>
             </div>
           </div>
@@ -325,7 +326,7 @@ export default function SettingsPage() {
       </Card>
 
       {/* Default Preferences */}
-      <Card>
+      <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
         <CardHeader>
           <CardTitle className="text-base">Default Preferences</CardTitle>
           <CardDescription>These defaults are pre-selected when running optimizations</CardDescription>
@@ -362,7 +363,7 @@ export default function SettingsPage() {
             </div>
           </div>
           <Button
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300 min-h-[44px] px-5 sm:px-6"
             onClick={() =>
               updateSettings.mutate({ defaultCarrier, defaultFillMaterial })
             }
@@ -374,12 +375,12 @@ export default function SettingsPage() {
       </Card>
 
       {/* Danger Zone */}
-      <Card className="border-red-200">
+      <Card className="border-red-200 rounded-2xl sm:rounded-3xl">
         <CardHeader>
           <CardTitle className="text-base text-red-600">Danger Zone</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="text-sm font-medium">Delete Organization</p>
               <p className="text-sm text-muted-foreground">
@@ -389,7 +390,7 @@ export default function SettingsPage() {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive" size="sm">
-                  <Trash2 className="mr-2 h-4 w-4" />
+                  <Trash size={16} className="mr-2" />
                   Delete
                 </Button>
               </AlertDialogTrigger>

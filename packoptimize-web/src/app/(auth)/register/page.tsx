@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PackageOpen, Loader2 } from "lucide-react";
+import { Intersect, SpinnerGap } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -86,13 +86,15 @@ export default function RegisterPage() {
     }
   };
 
+  const inputCls = "rounded-full bg-[#F5F6F8] border-gray-200 focus:ring-[#0B4228]/20 focus:border-[#0B4228]";
+
   return (
-    <Card className="w-full max-w-md">
+    <Card className="w-full max-w-md rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100">
       <CardHeader className="text-center">
-        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100">
-          <PackageOpen className="h-6 w-6 text-blue-600" />
+        <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-[#0B4228]">
+          <Intersect size={24} className="text-[#91E440]" weight="bold" />
         </div>
-        <CardTitle className="text-2xl">Create your account</CardTitle>
+        <CardTitle className="text-2xl text-[#0B4228]">Create your account</CardTitle>
         <CardDescription>
           Start optimizing your packaging today
         </CardDescription>
@@ -101,74 +103,36 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="tenantName">Company Name</Label>
-            <Input
-              id="tenantName"
-              placeholder="Acme Corp"
-              value={formData.tenantName}
-              onChange={(e) => updateField("tenantName", e.target.value)}
-            />
-            {errors.tenantName && (
-              <p className="text-sm text-destructive">{errors.tenantName}</p>
-            )}
+            <Input id="tenantName" placeholder="Acme Corp" value={formData.tenantName} onChange={(e) => updateField("tenantName", e.target.value)} className={inputCls} />
+            {errors.tenantName && <p className="text-sm text-destructive">{errors.tenantName}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="tenantSlug">Company Slug</Label>
-            <Input
-              id="tenantSlug"
-              placeholder="acme-corp"
-              value={formData.tenantSlug}
-              onChange={(e) => updateField("tenantSlug", e.target.value)}
-            />
-            {errors.tenantSlug && (
-              <p className="text-sm text-destructive">{errors.tenantSlug}</p>
-            )}
+            <Input id="tenantSlug" placeholder="acme-corp" value={formData.tenantSlug} onChange={(e) => updateField("tenantSlug", e.target.value)} className={inputCls} />
+            {errors.tenantSlug && <p className="text-sm text-destructive">{errors.tenantSlug}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="admin@company.com"
-              value={formData.email}
-              onChange={(e) => updateField("email", e.target.value)}
-            />
-            {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
-            )}
+            <Input id="email" type="email" placeholder="admin@company.com" value={formData.email} onChange={(e) => updateField("email", e.target.value)} className={inputCls} />
+            {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="Min 8 characters"
-              value={formData.password}
-              onChange={(e) => updateField("password", e.target.value)}
-            />
-            {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
-            )}
+            <Input id="password" type="password" placeholder="Min 8 characters" value={formData.password} onChange={(e) => updateField("password", e.target.value)} className={inputCls} />
+            {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              type="password"
-              placeholder="Repeat your password"
-              value={formData.confirmPassword}
-              onChange={(e) => updateField("confirmPassword", e.target.value)}
-            />
-            {errors.confirmPassword && (
-              <p className="text-sm text-destructive">{errors.confirmPassword}</p>
-            )}
+            <Input id="confirmPassword" type="password" placeholder="Repeat your password" value={formData.confirmPassword} onChange={(e) => updateField("confirmPassword", e.target.value)} className={inputCls} />
+            {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword}</p>}
           </div>
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" className="w-full bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300 min-h-[44px]" disabled={loading}>
+            {loading && <SpinnerGap size={16} className="mr-2 animate-spin" />}
             Create Account
           </Button>
           <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-blue-600 hover:underline">
+            <Link href="/login" className="font-medium text-[#0B4228] hover:underline">
               Sign in
             </Link>
           </p>

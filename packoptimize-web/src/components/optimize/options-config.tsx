@@ -42,8 +42,8 @@ export function OptionsConfig({
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <Card>
+      <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
+        <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
           <CardHeader>
             <CardTitle className="text-sm">Carrier</CardTitle>
           </CardHeader>
@@ -61,7 +61,7 @@ export function OptionsConfig({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
           <CardHeader>
             <CardTitle className="text-sm">Optimize For</CardTitle>
           </CardHeader>
@@ -79,7 +79,7 @@ export function OptionsConfig({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
           <CardHeader>
             <CardTitle className="text-sm">Fill Material</CardTitle>
           </CardHeader>
@@ -99,7 +99,7 @@ export function OptionsConfig({
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
           <CardHeader>
             <CardTitle className="text-sm">Max Boxes</CardTitle>
           </CardHeader>
@@ -123,11 +123,11 @@ export function OptionsConfig({
         <Label>Include USPS Flat Rate Comparison</Label>
       </div>
 
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={onBack}>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-between">
+        <Button variant="outline" className="w-full sm:w-auto rounded-full" onClick={onBack}>
           Back
         </Button>
-        <Button className="bg-blue-600 hover:bg-blue-700" onClick={onRun} disabled={isRunning}>
+        <Button className="w-full sm:w-auto bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md hover:shadow-[0_20px_40px_-10px_rgba(11,66,40,0.15)] active:scale-95 transition-all duration-300 min-h-[44px] px-5 sm:px-6" onClick={onRun} disabled={isRunning}>
           {isRunning ? "Optimizing..." : "Run Optimization"}
         </Button>
       </div>

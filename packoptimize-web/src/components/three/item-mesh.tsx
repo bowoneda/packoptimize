@@ -64,7 +64,7 @@ function ItemMeshComponent({ placement }: ItemMeshProps) {
           style={{ pointerEvents: "none", zIndex: 50 }}
           zIndexRange={[50, 0]}
         >
-          <div className="rounded-md border bg-white px-3 py-2 text-xs shadow-lg whitespace-nowrap -translate-y-full mb-2">
+          <div className="rounded-2xl border border-gray-100 bg-white px-3 py-2 text-xs shadow-[0_10px_40px_-10px_rgba(0,0,0,0.12)] whitespace-nowrap -translate-y-full mb-2">
             <p className="font-semibold">{placement.name}</p>
             <p className="text-muted-foreground">SKU: {placement.sku}</p>
             <p className="text-muted-foreground">
@@ -72,7 +72,7 @@ function ItemMeshComponent({ placement }: ItemMeshProps) {
             </p>
             <p className="text-muted-foreground">{placement.weight}g</p>
             {placement.rotation !== 0 && (
-              <p className="text-blue-600">Rotated {placement.rotation}&deg;</p>
+              <p className="text-[#0B4228]">Rotated {placement.rotation}&deg;</p>
             )}
             {placement.isFragile && (
               <p className="text-red-600 font-medium">Fragile</p>

@@ -6,7 +6,7 @@ import { ItemsTable } from "@/components/items/items-table";
 import { ItemFormDialog } from "@/components/items/item-form-dialog";
 import { CsvImportDialog } from "@/components/items/csv-import-dialog";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus, Upload } from "lucide-react";
+import { Plus, DownloadSimple } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import type { Item } from "@/types/api";
 
@@ -66,37 +66,33 @@ export default function ItemsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold">Items</h2>
           <p className="text-sm text-muted-foreground">
             Manage your product catalog for packing optimization
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setCsvOpen(true)}>
-            <Upload className="mr-2 h-4 w-4" />
+        <div className="flex gap-2 shrink-0">
+          <Button variant="outline" onClick={() => setCsvOpen(true)} className="rounded-full border-gray-200 hover:bg-[#F5F6F8]">
+            <DownloadSimple size={16} className="mr-2" />
             Import CSV
           </Button>
           <Button
-            className="bg-blue-600 hover:bg-blue-700"
+            className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300 min-h-[44px] px-5 sm:px-6"
             onClick={() => {
               setEditingItem(null);
               setFormOpen(true);
             }}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus size={16} className="mr-2" />
             Add Item
           </Button>
         </div>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+        <TableSkeleton rows={5} />
       ) : (
         <ItemsTable
           items={items ?? []}

@@ -1,0 +1,94 @@
+Summary
+We are building a multi-tenant SaaS platform that optimizes packaging decisions for shipping operations. The system calculates the most efficient box configuration for items based on dimensions, fragility constraints, and available inventory — including multi-box joining logic.
+
+Our target customers include 3PLs, specialty shippers, and eCommerce operators seeking to reduce dimensional weight costs and packaging waste.
+
+This is an early-stage build with real commercial potential.
+We are seeking a Senior Full-Stack Engineer to architect and build the core SaaS platform from the ground up.
+
+This is not a simple web app.
+The system includes:
+
+Multi-tenant architecture
+
+Optimization algorithms (3D fitting logic)
+
+API-first design
+
+Usage-based billing
+
+Admin dashboards
+
+Performance-sensitive logic
+
+You will serve as the primary technical lead during MVP development.
+Core Responsibilities
+
+Architect and implement multi-tenant SaaS backend
+
+Design PostgreSQL schema for scalable data modeling
+
+Build RESTful API for optimization engine
+
+Implement box-fit and multi-box combination logic
+
+Develop React/Next.js frontend dashboard
+
+Integrate Stripe subscription billing
+
+Deploy and manage cloud infrastructure (AWS or DigitalOcean)
+
+Implement authentication (JWT / OAuth)
+
+Ensure performance optimization and API efficiency
+
+Establish CI/CD workflows
+
+Required Technical Skills
+Backend
+
+Strong Python (FastAPI or Django) OR Node.js (NestJS preferred)
+
+REST API architecture
+
+PostgreSQL (schema design, indexing, migrations)
+
+Authentication & authorization systems
+
+Experience building multi-tenant SaaS platforms
+
+Stripe subscription billing integration
+
+Performance optimization for compute-heavy logic
+
+Frontend
+
+React or Next.js
+
+Component-based architecture
+
+State management best practices
+
+Building B2B dashboards
+
+DevOps
+
+AWS, DigitalOcean, or equivalent
+
+Docker
+
+CI/CD pipelines
+
+Logging and monitoring setup
+
+Preferred / Bonus Experience
+
+Logistics, warehouse, or shipping software
+
+Optimization or bin-packing algorithms
+
+API integrations with eCommerce platforms
+
+Usage-based billing systems
+
+Early-stage startup experience

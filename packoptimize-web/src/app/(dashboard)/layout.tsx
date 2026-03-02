@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
+import { MobileHeader } from "@/components/layout/mobile-header";
+import { MobileBottomNav } from "@/components/layout/mobile-bottom-nav";
 
 export default function DashboardLayout({
   children,
@@ -28,19 +30,32 @@ export default function DashboardLayout({
 
   if (!ready || !isAuthenticated) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent" />
+      <div className="flex h-screen items-center justify-center bg-[#F5F6F8]">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#0B4228] border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#F5F6F8]">
+      {/* Desktop sidebar — hidden on mobile */}
       <Sidebar />
-      <div className="md:pl-[260px]">
+
+      <div className="md:pl-[280px]">
+        {/* Desktop header — hidden on mobile */}
         <Header />
-        <main className="p-6">{children}</main>
+
+        {/* Mobile header — visible only on mobile */}
+        <MobileHeader />
+
+        {/* Main content — extra bottom padding on mobile for floating nav */}
+        <main className="px-4 py-4 sm:px-6 sm:py-5 lg:p-8 pb-28 md:pb-8">
+          {children}
+        </main>
       </div>
+
+      {/* Floating bottom nav — visible only on mobile */}
+      <MobileBottomNav />
     </div>
   );
 }

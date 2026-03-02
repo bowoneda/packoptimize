@@ -3,9 +3,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useCarrierRules } from "@/hooks/use-carrier-rules";
-import { Truck } from "lucide-react";
+import { Books, Truck } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 
 function formatWeight(lbs: number) {
   return `${lbs} lbs`;
@@ -21,12 +22,8 @@ export default function CarrierRulesPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-2xl font-semibold tracking-tight">Carrier Rules</h1>
-        <div className="grid gap-4 md:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-64 w-full" />
-          ))}
-        </div>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Carrier Rules</h1>
+        <TableSkeleton rows={3} />
       </div>
     );
   }
@@ -41,17 +38,17 @@ export default function CarrierRulesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Carrier Rules</h1>
+        <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">Carrier Rules</h1>
         <p className="text-sm text-muted-foreground">
           Carrier size limits, DIM divisors, and surcharge thresholds
         </p>
       </div>
 
       <Tabs defaultValue="FEDEX">
-        <TabsList>
+        <TabsList className="flex w-full overflow-x-auto">
           {carriers.map((c) => (
             <TabsTrigger key={c} value={c}>
-              <Truck className="mr-1.5 h-3.5 w-3.5" />
+              <Books size={14} className="mr-1.5" />
               {carrierLabels[c]}
             </TabsTrigger>
           ))}
@@ -61,9 +58,13 @@ export default function CarrierRulesPage() {
           const rule = rules?.find((r) => r.carrier === carrier);
           if (!rule) return (
             <TabsContent key={carrier} value={carrier}>
-              <Card>
-                <CardContent className="py-8 text-center text-muted-foreground">
-                  No rules found for {carrierLabels[carrier]}
+              <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
+                <CardContent>
+                  <EmptyState
+                    icon={Truck}
+                    title={`No rules for ${carrierLabels[carrier]}`}
+                    description="Carrier rules are loaded from your API. Check your backend configuration."
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -71,8 +72,8 @@ export default function CarrierRulesPage() {
 
           return (
             <TabsContent key={carrier} value={carrier}>
-              <div className="grid gap-4 md:grid-cols-2">
-                <Card>
+              <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2">
+                <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
                   <CardHeader>
                     <CardTitle className="text-sm">Size & Weight Limits</CardTitle>
                   </CardHeader>
@@ -84,7 +85,7 @@ export default function CarrierRulesPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
                   <CardHeader>
                     <CardTitle className="text-sm">Additional Handling (AHS) Thresholds</CardTitle>
                   </CardHeader>
@@ -96,7 +97,7 @@ export default function CarrierRulesPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
                   <CardHeader>
                     <CardTitle className="text-sm">Oversize Thresholds</CardTitle>
                   </CardHeader>
@@ -105,7 +106,7 @@ export default function CarrierRulesPage() {
                   </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
                   <CardHeader>
                     <CardTitle className="text-sm">Surcharge Rates</CardTitle>
                   </CardHeader>
@@ -115,7 +116,7 @@ export default function CarrierRulesPage() {
                         <span className="text-muted-foreground capitalize">
                           {type.replace(/_/g, " ").toLowerCase()}
                         </span>
-                        <Badge variant="secondary">${Number(amount).toFixed(2)}</Badge>
+                        <Badge variant="secondary" className="shrink-0">${Number(amount).toFixed(2)}</Badge>
                       </div>
                     ))}
                     {Object.keys(rule.surchargeRates).length === 0 && (

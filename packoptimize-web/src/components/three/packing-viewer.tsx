@@ -57,17 +57,17 @@ export default function PackingViewer({ packedBoxes }: PackingViewerProps) {
 
   if (packedBoxes.length === 0) {
     return (
-      <div className="flex h-[400px] items-center justify-center rounded-md border bg-slate-50 text-muted-foreground">
+      <div className="flex h-[250px] sm:h-[400px] items-center justify-center bg-[#F5F6F8] rounded-2xl sm:rounded-3xl border border-gray-100 text-muted-foreground">
         No packed boxes to display
       </div>
     );
   }
 
   return (
-    <div className="h-[500px] w-full rounded-md border bg-[#f8fafc]">
+    <div className="h-[300px] sm:h-[400px] lg:h-[500px] w-full rounded-2xl sm:rounded-3xl border border-gray-100 bg-[#F5F6F8]">
       <Canvas
         camera={{ position: cameraPosition, fov: 50, near: 1, far: 10000 }}
-        style={{ borderRadius: "0.375rem" }}
+        style={{ borderRadius: "1.5rem" }}
       >
         <ambientLight intensity={0.5} />
         <directionalLight position={[200, 400, 200]} intensity={0.8} />

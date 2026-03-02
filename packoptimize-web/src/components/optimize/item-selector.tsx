@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import type { Item } from "@/types/api";
 
@@ -52,17 +51,17 @@ export function ItemSelector({ items, selected, onChange, onNext }: ItemSelector
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder="Search items..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="max-w-sm"
+          className="w-full sm:max-w-sm rounded-full bg-[#F5F6F8] border-gray-200"
         />
-        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-          <Badge variant="secondary">{selected.length} items</Badge>
-          <Badge variant="secondary">{totalUnits} units</Badge>
-          <Badge variant="secondary">~{(totalWeight / 1000).toFixed(2)} kg</Badge>
+        <div className="flex items-center gap-2 sm:gap-3 text-sm text-muted-foreground flex-wrap">
+          <span className="bg-[#91E440] text-[#0B4228] px-3 py-1 rounded-full text-xs font-bold">{selected.length} items</span>
+          <span className="bg-[#91E440] text-[#0B4228] px-3 py-1 rounded-full text-xs font-bold">{totalUnits} units</span>
+          <span className="bg-[#91E440] text-[#0B4228] px-3 py-1 rounded-full text-xs font-bold">~{(totalWeight / 1000).toFixed(2)} kg</span>
         </div>
       </div>
 
@@ -73,8 +72,8 @@ export function ItemSelector({ items, selected, onChange, onNext }: ItemSelector
           return (
             <div
               key={item.id}
-              className={`flex items-center gap-4 border-b px-4 py-3 last:border-b-0 ${
-                isSelected ? "bg-blue-50/50" : ""
+              className={`flex items-center gap-2 sm:gap-4 border-b px-3 sm:px-4 py-3 last:border-b-0 ${
+                isSelected ? "bg-[#E8F5EE]/50" : ""
               }`}
             >
               <Checkbox
@@ -83,21 +82,21 @@ export function ItemSelector({ items, selected, onChange, onNext }: ItemSelector
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{item.name}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground truncate">
                   {item.sku} &middot; {item.width}x{item.height}x{item.depth}mm &middot; {item.weight}g
                   {item.isFragile && " \u26A0 Fragile"}
                 </p>
               </div>
               {isSelected && (
-                <div className="flex items-center gap-2">
-                  <span className="text-xs text-muted-foreground">Qty:</span>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <span className="text-xs text-muted-foreground hidden sm:inline">Qty:</span>
                   <Input
                     type="number"
                     min={1}
                     max={100}
                     value={sel?.quantity ?? 1}
                     onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                    className="w-16 h-8 text-center"
+                    className="w-14 sm:w-16 h-8 text-center text-sm"
                   />
                 </div>
               )}
@@ -108,7 +107,7 @@ export function ItemSelector({ items, selected, onChange, onNext }: ItemSelector
 
       <div className="flex justify-end">
         <Button
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300"
           onClick={onNext}
           disabled={selected.length === 0}
         >

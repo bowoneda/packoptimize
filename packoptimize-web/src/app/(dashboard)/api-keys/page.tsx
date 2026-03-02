@@ -34,7 +34,9 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import api from "@/lib/api";
 import type { ApiKey, CreateApiKeyResponse } from "@/types/api";
-import { Key, Plus, Copy, Trash2, AlertTriangle } from "lucide-react";
+import { Key, Plus, Copy, Trash, Warning } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/shared/empty-state";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 import { format } from "date-fns";
 import { toast } from "sonner";
 
@@ -128,28 +130,28 @@ export default function ApiKeysPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">API Keys</h1>
+          <h1 className="text-xl sm:text-2xl font-semibold tracking-tight">API Keys</h1>
           <p className="text-sm text-muted-foreground">
             Manage API keys for programmatic access
           </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={handleDialogClose}>
           <DialogTrigger asChild>
-            <Button className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="mr-2 h-4 w-4" />
+            <Button className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300 min-h-[44px] px-5 sm:px-6">
+              <Plus size={16} className="mr-2" />
               Create Key
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{newKey ? "API Key Created" : "Create API Key"}</DialogTitle>
             </DialogHeader>
             {newKey ? (
               <div className="space-y-4">
                 <Alert className="border-amber-500 bg-amber-50">
-                  <AlertTriangle className="h-4 w-4" />
+                  <Warning size={16} />
                   <AlertDescription>
                     Save this key now — you will not be able to see it again.
                   </AlertDescription>
@@ -161,7 +163,7 @@ export default function ApiKeysPage() {
                     size="icon"
                     onClick={() => copyToClipboard(newKey.key)}
                   >
-                    <Copy className="h-4 w-4" />
+                    <Copy size={16} />
                   </Button>
                 </div>
                 <Button
@@ -213,7 +215,7 @@ export default function ApiKeysPage() {
                 </div>
 
                 <Button
-                  className="w-full bg-blue-600 hover:bg-blue-700"
+                  className="w-full bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300"
                   onClick={handleCreate}
                   disabled={createKey.isPending || selectedPermissions.length === 0}
                 >
@@ -225,16 +227,15 @@ export default function ApiKeysPage() {
         </Dialog>
       </div>
 
-      <Card>
+      <Card className="rounded-2xl sm:rounded-3xl border-gray-100">
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="p-4 space-y-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
+            <div className="p-4">
+              <TableSkeleton rows={3} />
             </div>
           ) : keys && keys.length > 0 ? (
-            <Table>
+            <div className="overflow-x-auto">
+            <Table className="min-w-[600px]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Key Prefix</TableHead>
@@ -254,7 +255,7 @@ export default function ApiKeysPage() {
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
                         {key.permissions.map((p) => (
-                          <Badge key={p} variant="secondary" className="text-xs">
+                          <Badge key={p} variant="secondary" className="text-xs rounded-full">
                             {p}
                           </Badge>
                         ))}
@@ -280,18 +281,22 @@ export default function ApiKeysPage() {
                         onClick={() => revokeKey.mutate(key.id)}
                         className="text-red-600 hover:text-red-700"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash size={16} />
                       </Button>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          ) : (
-            <div className="py-8 text-center text-muted-foreground">
-              <Key className="mx-auto h-12 w-12 mb-3 opacity-50" />
-              <p>No API keys yet. Create one to get started.</p>
             </div>
+          ) : (
+            <EmptyState
+              icon={Key}
+              title="No API keys yet"
+              description="Create an API key to integrate PackOptimize with your WMS or Shopify store."
+              actionLabel="Create API Key"
+              onAction={() => setDialogOpen(true)}
+            />
           )}
         </CardContent>
       </Card>

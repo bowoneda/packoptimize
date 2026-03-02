@@ -5,7 +5,7 @@ import { useBoxes, useCreateBox, useUpdateBox, useDeleteBox } from "@/hooks/use-
 import { BoxesTable } from "@/components/boxes/boxes-table";
 import { BoxFormDialog } from "@/components/boxes/box-form-dialog";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
+import { TableSkeleton } from "@/components/shared/table-skeleton";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Plus } from "lucide-react";
+import { Plus } from "@phosphor-icons/react";
 import { toast } from "sonner";
 import type { BoxType } from "@/types/api";
 
@@ -64,7 +64,7 @@ export default function BoxesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-lg font-semibold">Box Inventory</h2>
           <p className="text-sm text-muted-foreground">
@@ -72,23 +72,19 @@ export default function BoxesPage() {
           </p>
         </div>
         <Button
-          className="bg-blue-600 hover:bg-blue-700"
+          className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300 min-h-[44px] px-5 sm:px-6"
           onClick={() => {
             setEditingBox(null);
             setFormOpen(true);
           }}
         >
-          <Plus className="mr-2 h-4 w-4" />
+          <Plus size={16} className="mr-2" />
           Add Box Type
         </Button>
       </div>
 
       {isLoading ? (
-        <div className="space-y-3">
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Skeleton key={i} className="h-12 w-full" />
-          ))}
-        </div>
+        <TableSkeleton rows={5} />
       ) : (
         <BoxesTable
           boxes={boxes ?? []}

@@ -87,7 +87,7 @@ export function CsvImportDialog({ open, onOpenChange }: CsvImportDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-lg mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Import Items from CSV</DialogTitle>
         </DialogHeader>
@@ -109,6 +109,7 @@ export function CsvImportDialog({ open, onOpenChange }: CsvImportDialogProps) {
                 Preview ({Math.min(rows.length, 5)} of {rows.length} rows)
               </p>
               <div className="max-h-60 overflow-auto rounded-md border">
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -133,13 +134,14 @@ export function CsvImportDialog({ open, onOpenChange }: CsvImportDialogProps) {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               </div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setRows([])}>
                   Clear
                 </Button>
                 <Button
-                  className="bg-blue-600 hover:bg-blue-700"
+                  className="bg-[#0B4228] hover:bg-[#115C3A] rounded-full shadow-md active:scale-95 transition-all duration-300"
                   onClick={handleImport}
                   disabled={importing}
                 >

@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Lightning } from "@phosphor-icons/react";
+import { EmptyState } from "@/components/shared/empty-state";
 import { format } from "date-fns";
 import type { OptimizationRun } from "@/types/api";
 
@@ -21,9 +23,9 @@ interface RecentRunsProps {
 
 export function RecentRuns({ runs, isLoading }: RecentRunsProps) {
   return (
-    <Card>
+    <Card className="rounded-2xl sm:rounded-3xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.08)] border border-gray-100">
       <CardHeader>
-        <CardTitle className="text-base">Recent Optimization Runs</CardTitle>
+        <CardTitle className="text-base text-[#0B4228]">Recent Optimization Runs</CardTitle>
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -33,11 +35,16 @@ export function RecentRuns({ runs, isLoading }: RecentRunsProps) {
             ))}
           </div>
         ) : runs.length === 0 ? (
-          <p className="py-8 text-center text-sm text-muted-foreground">
-            No optimization runs yet. Go to Optimize to run your first optimization.
-          </p>
+          <EmptyState
+            icon={Lightning}
+            title="No optimization runs yet"
+            description="Run your first optimization to see results here."
+            actionLabel="Start Optimizing"
+            actionHref="/optimize"
+          />
         ) : (
-          <Table>
+          <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <Table className="min-w-[500px]">
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
@@ -50,7 +57,7 @@ export function RecentRuns({ runs, isLoading }: RecentRunsProps) {
             </TableHeader>
             <TableBody>
               {runs.map((run) => (
-                <TableRow key={run.id}>
+                <TableRow key={run.id} className="hover:bg-[#F5F6F8] transition-colors">
                   <TableCell className="text-sm">
                     {format(new Date(run.createdAt), "MMM d, yyyy HH:mm")}
                   </TableCell>
@@ -58,17 +65,18 @@ export function RecentRuns({ runs, isLoading }: RecentRunsProps) {
                   <TableCell>{run.boxCount}</TableCell>
                   <TableCell>${run.totalCost.toFixed(2)}</TableCell>
                   <TableCell>
-                    <Badge variant="secondary" className="bg-green-50 text-green-700">
+                    <span className="bg-[#91E440] text-[#0B4228] px-3 py-1 rounded-full text-xs font-bold">
                       ${run.savingsAmount.toFixed(2)}
-                    </Badge>
+                    </span>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="outline">{run.carrier}</Badge>
+                    <Badge variant="outline" className="rounded-full">{run.carrier}</Badge>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
+          </div>
         )}
       </CardContent>
     </Card>
