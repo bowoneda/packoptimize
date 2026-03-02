@@ -7,13 +7,13 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
   try {
-    console.log('Bootstrap starting...');
+    console.error('[BOOT] Bootstrap starting...');
 
     const app = await NestFactory.create(AppModule, {
       rawBody: true,
     });
 
-    console.log('NestJS app created, configuring...');
+    console.error('[BOOT] NestJS app created, configuring...');
 
     const logger = new Logger('Bootstrap');
 
