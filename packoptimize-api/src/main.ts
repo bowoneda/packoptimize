@@ -6,10 +6,13 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 async function bootstrap() {
+  console.log('Bootstrap starting...');
+
   const app = await NestFactory.create(AppModule, {
-    bufferLogs: true,
     rawBody: true,
   });
+
+  console.log('NestJS app created, configuring...');
 
   const logger = new Logger('Bootstrap');
 
@@ -54,4 +57,7 @@ async function bootstrap() {
   logger.log(`Application is running on: http://0.0.0.0:${port}`);
   logger.log(`Swagger docs available at: http://localhost:${port}/api/docs`);
 }
-bootstrap();
+bootstrap().catch((err) => {
+  console.error('Bootstrap failed:', err);
+  process.exit(1);
+});
