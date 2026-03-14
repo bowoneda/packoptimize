@@ -25,7 +25,6 @@ const referenceItems = [
   { href: "/carrier-rules", label: "Carrier Rules", icon: Books },
   { href: "/api-docs", label: "API Docs", icon: Books },
   { href: "/api-keys", label: "API Keys", icon: Key },
-  { href: "/settings", label: "Settings", icon: Gear },
 ];
 
 export function Sidebar() {
@@ -51,6 +50,8 @@ export function Sidebar() {
       );
     });
 
+  const settingsActive = pathname === "/settings" || pathname.startsWith("/settings/");
+
   return (
     <aside className="fixed left-0 top-0 z-30 hidden h-screen w-[280px] bg-white border-r border-[#E8EAED] md:flex md:flex-col p-6">
       {/* Logo */}
@@ -61,7 +62,7 @@ export function Sidebar() {
         <span className="font-bold text-xl text-[#0B4228] tracking-tight">PackOpt</span>
       </div>
 
-      {/* Menu */}
+      {/* Menu — grows to fill available space */}
       <div className="flex-1 space-y-8 overflow-y-auto">
         <div>
           <p className="text-xs text-[#8B95A5] font-medium mb-4 pl-4 uppercase tracking-wider">Menu</p>
@@ -73,6 +74,21 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* Settings — pinned to bottom */}
+      <div className="pt-4 border-t border-[#E8EAED]">
+        <Link
+          href="/settings"
+          className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-colors",
+            settingsActive
+              ? "bg-[#0B4228] text-white shadow-md"
+              : "text-[#8B95A5] hover:text-[#0B4228] hover:bg-[#F5F6F8]"
+          )}
+        >
+          <Gear size={18} weight={settingsActive ? "fill" : "regular"} className={settingsActive ? "text-[#91E440]" : ""} />
+          Settings
+        </Link>
+      </div>
     </aside>
   );
 }
