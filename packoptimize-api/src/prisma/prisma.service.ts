@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
 import { ClsService } from 'nestjs-cls';
 
 @Injectable()
@@ -7,7 +8,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(private readonly cls: ClsService) {
-    super({ datasources: { db: { url: process.env.DATABASE_URL } } });
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    super({ adapter });
   }
 
   async onModuleInit() {
@@ -45,7 +47,8 @@ export class PrismaServiceWithoutTenant extends PrismaClient implements OnModule
   private readonly logger = new Logger(PrismaServiceWithoutTenant.name);
 
   constructor() {
-    super({ datasources: { db: { url: process.env.DATABASE_URL } } });
+    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    super({ adapter });
   }
 
   async onModuleInit() {
