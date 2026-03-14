@@ -12,7 +12,6 @@ import {
   Key,
   Gear,
   Intersect,
-  User,
 } from "@phosphor-icons/react";
 
 const menuItems = [
@@ -26,7 +25,6 @@ const referenceItems = [
   { href: "/carrier-rules", label: "Carrier Rules", icon: Books },
   { href: "/api-docs", label: "API Docs", icon: Books },
   { href: "/api-keys", label: "API Keys", icon: Key },
-  { href: "/profile", label: "Profile", icon: User },
   { href: "/settings", label: "Settings", icon: Gear },
 ];
 

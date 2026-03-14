@@ -37,7 +37,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F6F8]">
+    <div className="min-h-screen bg-[#F5F6F8]" style={{ zoom: 0.9 }}>
       {/* Desktop sidebar — hidden on mobile */}
       <Sidebar />
 
