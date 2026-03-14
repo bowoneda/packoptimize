@@ -62,8 +62,8 @@ export function Sidebar() {
         <span className="font-bold text-xl text-[#0B4228] tracking-tight">PackOpt</span>
       </div>
 
-      {/* Menu — grows to fill available space */}
-      <div className="flex-1 space-y-8 overflow-y-auto">
+      {/* Menu — grows to fill available space, groups spread top/bottom */}
+      <div className="flex-1 flex flex-col justify-between overflow-y-auto">
         <div>
           <p className="text-xs text-[#8B95A5] font-medium mb-4 pl-4 uppercase tracking-wider">Menu</p>
           <nav className="space-y-2">{renderNav(menuItems)}</nav>
