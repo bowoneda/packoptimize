@@ -75,18 +75,6 @@ export function Sidebar() {
         </div>
       </div>
 
-      {/* Upgrade Box */}
-      <div className="bg-[#0B4228] rounded-2xl sm:rounded-3xl p-5 text-white mt-auto relative overflow-hidden">
-        <div className="absolute -right-4 -top-4 w-24 h-24 bg-white/5 rounded-full blur-2xl pointer-events-none" />
-        <div className="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center mb-3">
-          <Intersect size={14} className="text-[#91E440]" weight="bold" />
-        </div>
-        <h4 className="font-bold mb-1 text-sm">Upgrade Pro</h4>
-        <p className="text-white/60 text-xs mb-4 leading-relaxed">Discover the benefit of an upgraded account</p>
-        <button className="w-full bg-[#115C3A] text-[#91E440] py-2 rounded-full text-xs font-bold border border-[#17754B] hover:bg-[#17754B] transition-colors">
-          Upgrade $49/mo
-        </button>
-      </div>
     </aside>
   );
 }
