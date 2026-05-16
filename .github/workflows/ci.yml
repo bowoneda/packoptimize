@@ -1,9 +1,9 @@
 name: CI
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
-    branches: [main]
+    branches: [master]
 
 jobs:
   test-api:
@@ -57,7 +57,7 @@ jobs:
           REDIS_URL: redis://localhost:6379
       - run: npm run build
 
-  build-frontend:
+  test-frontend:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -70,4 +70,5 @@ jobs:
           cache: npm
           cache-dependency-path: packoptimize-web/package-lock.json
       - run: npm ci
+      - run: npm test
       - run: npm run build

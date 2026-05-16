@@ -1,0 +1,45 @@
+app = "packoptimize-web-staging"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+  [build.args]
+    API_URL = "https://packoptimize-api-staging.fly.dev"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+  API_URL = "https://packoptimize-api-staging.fly.dev"
+  NEXT_PUBLIC_API_URL = "https://packoptimize-api-staging.fly.dev"
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+    force_https = true
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.http_checks]]
+    interval = 30000
+    timeout = 10000
+    grace_period = "30s"
+    method = "GET"
+    path = "/"
+    protocol = "http"
+
+[deploy]
+  strategy = "immediate"
