@@ -31,9 +31,15 @@ export class AuthController {
   @Throttle({ default: { limit: 5, ttl: 900000 } })
   @Post('register')
   @ApiOperation({ summary: 'Register a new tenant and admin user' })
-  @ApiResponse({ status: 201, description: 'Tenant and user created successfully' })
+  @ApiResponse({
+    status: 201,
+    description: 'Tenant and user created successfully',
+  })
   @ApiResponse({ status: 409, description: 'Tenant slug already exists' })
-  async register(@Body() dto: RegisterDto, @Res({ passthrough: true }) res: Response) {
+  async register(
+    @Body() dto: RegisterDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.authService.register(dto);
     res.cookie('access_token', result.accessToken, COOKIE_OPTIONS);
     return { user: result.user };
@@ -46,7 +52,10 @@ export class AuthController {
   @ApiOperation({ summary: 'Login with email, password, and tenant slug' })
   @ApiResponse({ status: 200, description: 'Login successful' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() dto: LoginDto, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body() dto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const result = await this.authService.login(dto);
     res.cookie('access_token', result.accessToken, COOKIE_OPTIONS);
     return { user: result.user };
@@ -56,7 +65,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Clear auth cookie and log out' })
-  async logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', { path: '/' });
     return { message: 'Logged out' };
   }
