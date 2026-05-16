@@ -1,4 +1,9 @@
-import { Injectable, Logger, NotFoundException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BillingService } from '../billing/billing.service';
 import { selectOptimalBoxes } from './engine/box-selector';
@@ -56,7 +61,11 @@ export class OptimizationService {
       }
 
       // 2. Load box types
-      const boxWhereClause: { tenantId: string; isActive: boolean; id?: { in: string[] } } = {
+      const boxWhereClause: {
+        tenantId: string;
+        isActive: boolean;
+        id?: { in: string[] };
+      } = {
         tenantId,
         isActive: true,
       };
@@ -68,7 +77,9 @@ export class OptimizationService {
       });
 
       if (dbBoxTypes.length === 0) {
-        throw new NotFoundException('No active box types found for this tenant');
+        throw new NotFoundException(
+          'No active box types found for this tenant',
+        );
       }
 
       // 3. Load carrier rules
@@ -91,10 +102,7 @@ export class OptimizationService {
       const dbCompatRules = await tx.itemCompatibility.findMany({
         where: {
           tenantId,
-          OR: [
-            { itemIdA: { in: itemIds } },
-            { itemIdB: { in: itemIds } },
-          ],
+          OR: [{ itemIdA: { in: itemIds } }, { itemIdB: { in: itemIds } }],
         },
       });
 
@@ -130,7 +138,8 @@ export class OptimizationService {
         cost: b.cost,
       }));
 
-      const surchargeRates = dbCarrierRules.surchargeRates as Record<string, number> ?? {};
+      const surchargeRates =
+        (dbCarrierRules.surchargeRates as Record<string, number>) ?? {};
       const carrierRules: CarrierRules = {
         carrier,
         maxLengthInches: dbCarrierRules.maxLengthInches,
@@ -159,11 +168,13 @@ export class OptimizationService {
         weight: ins.weight,
       }));
 
-      const compatibilityRules: CompatibilityRule[] = dbCompatRules.map((r) => ({
-        itemIdA: r.itemIdA,
-        itemIdB: r.itemIdB,
-        rule: r.rule as 'INCOMPATIBLE' | 'MUST_SHIP_TOGETHER',
-      }));
+      const compatibilityRules: CompatibilityRule[] = dbCompatRules.map(
+        (r) => ({
+          itemIdA: r.itemIdA,
+          itemIdB: r.itemIdB,
+          rule: r.rule as 'INCOMPATIBLE' | 'MUST_SHIP_TOGETHER',
+        }),
+      );
 
       const options: OptimizationOptions = {
         carrier,
@@ -184,14 +195,13 @@ export class OptimizationService {
       );
 
       // 8. Flat rate comparison
-      const flatRateOptions =
-        options.includeFlatRate
-          ? compareFlatRateOptions(
-              packableItems,
-              packedBoxes.reduce((s, b) => s + b.totalCost, 0),
-              carrier,
-            )
-          : [];
+      const flatRateOptions = options.includeFlatRate
+        ? compareFlatRateOptions(
+            packableItems,
+            packedBoxes.reduce((s, b) => s + b.totalCost, 0),
+            carrier,
+          )
+        : [];
 
       const executionTimeMs = Date.now() - startTime;
 
@@ -204,11 +214,13 @@ export class OptimizationService {
       );
       const averageUtilization =
         packedBoxes.length > 0
-          ? packedBoxes.reduce((s, b) => s + b.utilization, 0) / packedBoxes.length
+          ? packedBoxes.reduce((s, b) => s + b.utilization, 0) /
+            packedBoxes.length
           : 0;
 
       const savingsAmount = naiveCost - totalCost;
-      const savingsPercent = naiveCost > 0 ? (savingsAmount / naiveCost) * 100 : 0;
+      const savingsPercent =
+        naiveCost > 0 ? (savingsAmount / naiveCost) * 100 : 0;
 
       const result: OptimizationResult = {
         success: unpackedItems.length === 0,
@@ -257,12 +269,12 @@ export class OptimizationService {
             boxTypeId: pb.boxId.startsWith('flat-rate-') ? null : pb.boxId,
             boxIndex: pb.boxIndex,
             utilization: pb.utilization,
-            placements: JSON.parse(JSON.stringify(pb.placements)),
+            placements: JSON.parse(JSON.stringify(pb.placements)) as object,
             voidFillVolume: pb.voidFill.voidVolumeCubicMm,
             totalWeight: pb.totalWeight,
             dimWeight: pb.dimWeightGrams,
             billableWeight: pb.billableWeightGrams,
-            surcharges: JSON.parse(JSON.stringify(pb.surcharges)),
+            surcharges: JSON.parse(JSON.stringify(pb.surcharges)) as object,
             packInstructions: pb.packInstructions,
           },
         });
@@ -360,9 +372,10 @@ export class OptimizationService {
         totalBoxes,
         totalCost: parseFloat(totalCost.toFixed(2)),
         totalSavings: parseFloat(totalSavings.toFixed(2)),
-        averageUtilization: completedCount > 0
-          ? parseFloat((totalUtilization / completedCount).toFixed(4))
-          : 0,
+        averageUtilization:
+          completedCount > 0
+            ? parseFloat((totalUtilization / completedCount).toFixed(4))
+            : 0,
       },
     };
   }

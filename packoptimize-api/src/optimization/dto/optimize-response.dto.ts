@@ -89,7 +89,8 @@ export class OptimizeResponseDto {
   @ApiProperty() optimizedCost!: number;
   @ApiProperty() savingsAmount!: number;
   @ApiProperty() savingsPercent!: number;
-  @ApiPropertyOptional({ type: [FlatRateOptionDto] }) flatRateOptions?: FlatRateOptionDto[];
+  @ApiPropertyOptional({ type: [FlatRateOptionDto] })
+  flatRateOptions?: FlatRateOptionDto[];
   @ApiProperty() algorithm!: string;
   @ApiProperty() executionTimeMs!: number;
   @ApiProperty() carrier!: string;

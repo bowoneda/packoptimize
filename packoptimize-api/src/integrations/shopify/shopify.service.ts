@@ -39,9 +39,10 @@ export class ShopifyService {
         .map((i) => i.sku)
         .filter((s): s is string => !!s);
 
-      const catalogItems = skus.length > 0
-        ? await tx.item.findMany({ where: { tenantId, sku: { in: skus } } })
-        : [];
+      const catalogItems =
+        skus.length > 0
+          ? await tx.item.findMany({ where: { tenantId, sku: { in: skus } } })
+          : [];
 
       const skuMap = new Map(catalogItems.map((i) => [i.sku, i]));
 
@@ -119,7 +120,8 @@ export class ShopifyService {
         return { rates: [] };
       }
 
-      const surchargeRates = (dbCarrierRules.surchargeRates as Record<string, number>) ?? {};
+      const surchargeRates =
+        (dbCarrierRules.surchargeRates as Record<string, number>) ?? {};
       const carrierRules: CarrierRules = {
         carrier,
         maxLengthInches: dbCarrierRules.maxLengthInches,
@@ -158,9 +160,11 @@ export class ShopifyService {
       );
 
       const totalCost = packedBoxes.reduce((s, b) => s + b.totalCost, 0);
-      const avgUtilization = packedBoxes.length > 0
-        ? packedBoxes.reduce((s, b) => s + b.utilization, 0) / packedBoxes.length
-        : 0;
+      const avgUtilization =
+        packedBoxes.length > 0
+          ? packedBoxes.reduce((s, b) => s + b.utilization, 0) /
+            packedBoxes.length
+          : 0;
 
       // 6. Build Shopify-formatted rates
       const rates: ShopifyRateResponse[] = [];
@@ -193,7 +197,9 @@ export class ShopifyService {
         carrier,
       );
 
-      const cheaperFlatRate = flatRateOptions.find((fr) => fr.itemsFit && fr.price < totalCost);
+      const cheaperFlatRate = flatRateOptions.find(
+        (fr) => fr.itemsFit && fr.price < totalCost,
+      );
       if (cheaperFlatRate) {
         rates.push({
           service_name: `${cheaperFlatRate.boxName} (Flat Rate)`,

@@ -1,4 +1,9 @@
-import { AvailableBox, CarrierType, FlatRateOption, PackableItem } from './types';
+import {
+  AvailableBox,
+  CarrierType,
+  FlatRateOption,
+  PackableItem,
+} from './types';
 import { packItems } from './packing-engine';
 
 const MM_PER_INCH = 25.4;
@@ -109,7 +114,10 @@ export function compareFlatRateOptions(
     const result = packItems(items, box);
     const itemsFit = result.unpacked.length === 0;
 
-    const itemsWeightGrams = items.reduce((s, i) => s + i.weight * i.quantity, 0);
+    const itemsWeightGrams = items.reduce(
+      (s, i) => s + i.weight * i.quantity,
+      0,
+    );
     // Rough fill estimate: 10% of box volume
     const estimatedFillWeightGrams = 50; // Minimal for flat rate
     const totalWeightLbs =

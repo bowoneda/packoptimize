@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsBoolean, IsOptional, IsObject, Min } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  IsObject,
+  Min,
+} from 'class-validator';
 import type { Prisma } from '@prisma/client';
 
 export class CreateItemDto {
@@ -31,17 +38,26 @@ export class CreateItemDto {
   @Min(0)
   weight!: number;
 
-  @ApiPropertyOptional({ example: false, description: 'Whether item is fragile' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Whether item is fragile',
+  })
   @IsBoolean()
   @IsOptional()
   isFragile?: boolean;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether item can be rotated' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Whether item can be rotated',
+  })
   @IsBoolean()
   @IsOptional()
   canRotate?: boolean;
 
-  @ApiPropertyOptional({ example: 2000, description: 'Max weight this item can support on top (grams)' })
+  @ApiPropertyOptional({
+    example: 2000,
+    description: 'Max weight this item can support on top (grams)',
+  })
   @IsNumber()
   @Min(0)
   @IsOptional()

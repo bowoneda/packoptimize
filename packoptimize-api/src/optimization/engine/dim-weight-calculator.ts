@@ -55,10 +55,12 @@ export function calculateDimWeight(
     height: sorted[2],
   };
 
-  const cubicInches = roundedDims.length * roundedDims.width * roundedDims.height;
+  const cubicInches =
+    roundedDims.length * roundedDims.width * roundedDims.height;
 
   // USPS exemption: if cubic inches <= 1728, DIM weight = 0
-  const isExempt = carrier === 'USPS' && cubicInches <= USPS_EXEMPT_CUBIC_INCHES;
+  const isExempt =
+    carrier === 'USPS' && cubicInches <= USPS_EXEMPT_CUBIC_INCHES;
 
   let dimWeightLbs = 0;
   let dimWeightGrams = 0;

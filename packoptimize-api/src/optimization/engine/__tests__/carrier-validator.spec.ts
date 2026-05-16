@@ -38,7 +38,9 @@ describe('CarrierValidator', () => {
     );
 
     expect(result.isValid).toBe(true);
-    const ahsSurcharge = result.surcharges.find((s) => s.type === 'AHS_DIMENSION');
+    const ahsSurcharge = result.surcharges.find(
+      (s) => s.type === 'AHS_DIMENSION',
+    );
     expect(ahsSurcharge).toBeDefined();
     expect(ahsSurcharge!.amount).toBeGreaterThan(0);
   });
@@ -57,7 +59,9 @@ describe('CarrierValidator', () => {
     );
 
     expect(result.isValid).toBe(true);
-    const ahsSurcharge = result.surcharges.find((s) => s.type === 'AHS_DIMENSION');
+    const ahsSurcharge = result.surcharges.find(
+      (s) => s.type === 'AHS_DIMENSION',
+    );
     expect(ahsSurcharge).toBeUndefined();
   });
 
@@ -74,7 +78,9 @@ describe('CarrierValidator', () => {
       makeFedExRules(),
     );
 
-    const ahsSurcharge = result.surcharges.find((s) => s.type === 'AHS_DIMENSION');
+    const ahsSurcharge = result.surcharges.find(
+      (s) => s.type === 'AHS_DIMENSION',
+    );
     expect(ahsSurcharge).toBeUndefined();
   });
 
@@ -97,7 +103,9 @@ describe('CarrierValidator', () => {
       makeFedExRules(),
     );
 
-    const ahsSurcharge = result.surcharges.find((s) => s.type === 'AHS_DIMENSION');
+    const ahsSurcharge = result.surcharges.find(
+      (s) => s.type === 'AHS_DIMENSION',
+    );
     expect(ahsSurcharge).toBeDefined();
   });
 
@@ -140,7 +148,9 @@ describe('CarrierValidator', () => {
       makeFedExRules(),
     );
 
-    const oversizeSurcharge = result.surcharges.find((s) => s.type === 'OVERSIZE');
+    const oversizeSurcharge = result.surcharges.find(
+      (s) => s.type === 'OVERSIZE',
+    );
     expect(oversizeSurcharge).toBeDefined();
   });
 

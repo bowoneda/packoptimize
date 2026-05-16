@@ -120,7 +120,7 @@ export function resolveCompatibilityGroups(
   }
 
   // Convert to array of groups
-  let groups = Array.from(groupMap.values());
+  const groups = Array.from(groupMap.values());
 
   // For items in single-item groups (unaffiliated), try to merge with largest compatible group
   const mustShipIds = new Set<string>();

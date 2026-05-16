@@ -1,5 +1,18 @@
-import { Controller, Get, Post, Delete, Body, Param, ParseUUIDPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Delete,
+  Body,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ApiKeysService } from './api-keys.service';
 import { CreateApiKeyDto } from './dto/create-api-key.dto';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';
@@ -16,7 +29,10 @@ export class ApiKeysController {
   @Post()
   @Roles('ADMIN')
   @ApiOperation({ summary: 'Create a new API key' })
-  @ApiResponse({ status: 201, description: 'API key created. The raw key is only shown once.' })
+  @ApiResponse({
+    status: 201,
+    description: 'API key created. The raw key is only shown once.',
+  })
   async create(
     @CurrentTenant() tenantId: string,
     @CurrentUser() user: RequestUser,
@@ -38,7 +54,10 @@ export class ApiKeysController {
   @ApiOperation({ summary: 'Revoke an API key' })
   @ApiResponse({ status: 200, description: 'API key revoked' })
   @ApiResponse({ status: 404, description: 'API key not found' })
-  async revoke(@CurrentTenant() tenantId: string, @Param('id', ParseUUIDPipe) id: string) {
+  async revoke(
+    @CurrentTenant() tenantId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.apiKeysService.revoke(tenantId, id);
   }
 }

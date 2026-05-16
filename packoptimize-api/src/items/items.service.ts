@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateItemDto } from './dto/create-item.dto';
@@ -21,19 +26,26 @@ export class ItemsService {
           },
         });
       } catch (error) {
-        if (error instanceof Error && error.message.includes('Unique constraint')) {
-          throw new ConflictException(`Item with SKU '${dto.sku}' already exists`);
+        if (
+          error instanceof Error &&
+          error.message.includes('Unique constraint')
+        ) {
+          throw new ConflictException(
+            `Item with SKU '${dto.sku}' already exists`,
+          );
         }
         throw error;
       }
     });
   }
 
-  async findAll(tenantId: string) {
+  async findAll(tenantId: string, limit = 500, offset = 0) {
     return this.prisma.withTenantContext(async (tx) => {
       return tx.item.findMany({
         where: { tenantId },
         orderBy: { createdAt: 'desc' },
+        take: Math.min(limit, 1000),
+        skip: offset,
       });
     });
   }
@@ -58,7 +70,7 @@ export class ItemsService {
         where: { id },
         data: {
           ...rest,
-          ...(metadata !== undefined ? { metadata: metadata as Prisma.InputJsonValue } : {}),
+          ...(metadata !== undefined ? { metadata: metadata } : {}),
         },
       });
     });

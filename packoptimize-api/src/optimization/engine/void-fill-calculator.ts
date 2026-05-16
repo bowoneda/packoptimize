@@ -5,7 +5,10 @@ const CUBIC_MM_PER_CUBIC_IN = 16387.064;
 const GRAMS_PER_LB = 453.592;
 
 // Fill material density factors (lbs per cubic foot) and cost per cubic foot
-const FILL_DENSITIES: Record<FillMaterial, { density: number; costPerCuFt: number }> = {
+const FILL_DENSITIES: Record<
+  FillMaterial,
+  { density: number; costPerCuFt: number }
+> = {
   AIR_PILLOWS: { density: 0.2, costPerCuFt: 0.035 },
   KRAFT_PAPER: { density: 1.0, costPerCuFt: 0.055 },
   BUBBLE_WRAP: { density: 0.6, costPerCuFt: 0.115 },

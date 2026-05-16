@@ -1,7 +1,5 @@
 import { FillMaterial, Placement, Rotation, VoidFillResult } from './types';
 
-const CUBIC_MM_PER_CUBIC_IN = 16387.064;
-
 const FILL_MATERIAL_NAMES: Record<FillMaterial, string> = {
   AIR_PILLOWS: 'air pillows',
   KRAFT_PAPER: 'kraft paper',
@@ -10,7 +8,11 @@ const FILL_MATERIAL_NAMES: Record<FillMaterial, string> = {
   FOAM_IN_PLACE: 'foam-in-place',
 };
 
-function describePosition(placement: Placement, index: number, sorted: Placement[]): string {
+function describePosition(
+  placement: Placement,
+  index: number,
+  sorted: Placement[],
+): string {
   const isBottom = placement.y === 0;
   const isLeftBack = placement.x === 0 && placement.z === 0;
 
@@ -90,7 +92,8 @@ export function generatePackInstructions(
     }
 
     if (p.isFragile) {
-      instruction += ' ⚠ FRAGILE — handle with care, ensure adequate cushioning.';
+      instruction +=
+        ' ⚠ FRAGILE — handle with care, ensure adequate cushioning.';
     }
 
     instructions.push(instruction);
@@ -99,9 +102,13 @@ export function generatePackInstructions(
 
   // Void fill instruction if void > 10% of box volume
   // We check by comparing void volume to total box volume
-  const totalItemVolume = placements.reduce((s, p) => s + p.width * p.height * p.depth, 0);
+  const totalItemVolume = placements.reduce(
+    (s, p) => s + p.width * p.height * p.depth,
+    0,
+  );
   const totalVolume = voidFill.voidVolumeCubicMm + totalItemVolume;
-  const voidPercent = totalVolume > 0 ? voidFill.voidVolumeCubicMm / totalVolume : 0;
+  const voidPercent =
+    totalVolume > 0 ? voidFill.voidVolumeCubicMm / totalVolume : 0;
 
   if (voidPercent > 0.1) {
     const voidCubicIn = Math.round(voidFill.voidVolumeCubicIn);

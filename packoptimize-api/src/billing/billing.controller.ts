@@ -29,7 +29,9 @@ export class BillingController {
   }
 
   @Get('usage')
-  @ApiOperation({ summary: 'Get current billing usage for this billing period' })
+  @ApiOperation({
+    summary: 'Get current billing usage for this billing period',
+  })
   async getUsage(@CurrentTenant() tenantId: string) {
     return this.billingService.getUsage(tenantId);
   }

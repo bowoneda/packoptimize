@@ -1,4 +1,4 @@
-import { packItems, getRotatedDimensions } from '../packing-engine';
+import { packItems } from '../packing-engine';
 import { AvailableBox, PackableItem, Rotation } from '../types';
 
 function makeItem(overrides: Partial<PackableItem> = {}): PackableItem {
@@ -84,7 +84,9 @@ describe('PackingEngine', () => {
   // Test 4: Item larger than box in ALL dimensions -> unpacked
   it('should return oversized item in unpacked array', () => {
     const box = makeBox({ innerWidth: 50, innerHeight: 50, innerDepth: 50 });
-    const items = [makeItem({ width: 100, height: 100, depth: 100, canRotate: false })];
+    const items = [
+      makeItem({ width: 100, height: 100, depth: 100, canRotate: false }),
+    ];
     const result = packItems(items, box);
 
     expect(result.packed).toHaveLength(0);
@@ -133,7 +135,9 @@ describe('PackingEngine', () => {
       innerDepth: 40,
       maxWeight: 50000,
     });
-    const items = [makeItem({ width: 100, height: 50, depth: 30, canRotate: false })];
+    const items = [
+      makeItem({ width: 100, height: 50, depth: 30, canRotate: false }),
+    ];
     const result = packItems(items, box);
 
     expect(result.packed).toHaveLength(0);
@@ -165,8 +169,24 @@ describe('PackingEngine', () => {
   // Test 9: Fragile items have Y >= all non-fragile Y positions
   it('should place fragile items at or above non-fragile items', () => {
     const items = [
-      makeItem({ id: 'heavy', sku: 'HEAVY', isFragile: false, weight: 1000, width: 100, height: 50, depth: 50 }),
-      makeItem({ id: 'fragile', sku: 'FRAGILE', isFragile: true, weight: 200, width: 80, height: 40, depth: 40 }),
+      makeItem({
+        id: 'heavy',
+        sku: 'HEAVY',
+        isFragile: false,
+        weight: 1000,
+        width: 100,
+        height: 50,
+        depth: 50,
+      }),
+      makeItem({
+        id: 'fragile',
+        sku: 'FRAGILE',
+        isFragile: true,
+        weight: 200,
+        width: 80,
+        height: 40,
+        depth: 40,
+      }),
     ];
     const box = makeBox();
     const result = packItems(items, box);
@@ -185,8 +205,25 @@ describe('PackingEngine', () => {
   it('should respect maxStackWeight constraint', () => {
     // Place a lightweight item with low maxStackWeight, then try heavy item
     const items = [
-      makeItem({ id: 'base', sku: 'BASE', weight: 200, maxStackWeight: 100, width: 200, height: 50, depth: 200, isFragile: false }),
-      makeItem({ id: 'heavy', sku: 'HEAVY', weight: 5000, width: 200, height: 50, depth: 200, isFragile: false }),
+      makeItem({
+        id: 'base',
+        sku: 'BASE',
+        weight: 200,
+        maxStackWeight: 100,
+        width: 200,
+        height: 50,
+        depth: 200,
+        isFragile: false,
+      }),
+      makeItem({
+        id: 'heavy',
+        sku: 'HEAVY',
+        weight: 5000,
+        width: 200,
+        height: 50,
+        depth: 200,
+        isFragile: false,
+      }),
     ];
     // Use a box that forces vertical stacking
     const box = makeBox({ innerWidth: 200, innerHeight: 200, innerDepth: 200 });
@@ -201,9 +238,33 @@ describe('PackingEngine', () => {
   // Test 11: Sort order verification
   it('should place heavy non-fragile items before light fragile items', () => {
     const items = [
-      makeItem({ id: 'light-fragile', sku: 'LF', isFragile: true, weight: 100, width: 50, height: 30, depth: 30 }),
-      makeItem({ id: 'heavy-nf', sku: 'HNF', isFragile: false, weight: 2000, width: 80, height: 50, depth: 50 }),
-      makeItem({ id: 'medium-nf', sku: 'MNF', isFragile: false, weight: 500, width: 60, height: 40, depth: 40 }),
+      makeItem({
+        id: 'light-fragile',
+        sku: 'LF',
+        isFragile: true,
+        weight: 100,
+        width: 50,
+        height: 30,
+        depth: 30,
+      }),
+      makeItem({
+        id: 'heavy-nf',
+        sku: 'HNF',
+        isFragile: false,
+        weight: 2000,
+        width: 80,
+        height: 50,
+        depth: 50,
+      }),
+      makeItem({
+        id: 'medium-nf',
+        sku: 'MNF',
+        isFragile: false,
+        weight: 500,
+        width: 60,
+        height: 40,
+        depth: 40,
+      }),
     ];
     const box = makeBox();
     const result = packItems(items, box);
@@ -235,7 +296,12 @@ describe('PackingEngine', () => {
       }),
     );
     // Small box that fits maybe 3-4 items
-    const box = makeBox({ innerWidth: 200, innerHeight: 200, innerDepth: 200, maxWeight: 50000 });
+    const box = makeBox({
+      innerWidth: 200,
+      innerHeight: 200,
+      innerDepth: 200,
+      maxWeight: 50000,
+    });
     const result = packItems(items, box);
 
     // Some items should pack, some should not (20 80mm cubes won't all fit in 200mm cube)
@@ -268,7 +334,14 @@ describe('PackingEngine', () => {
   // Test 15: Performance - 10 items < 50ms
   it('should pack 10 items in under 50ms', () => {
     const items = Array.from({ length: 10 }, (_, i) =>
-      makeItem({ id: `p-${i}`, sku: `P-${i}`, width: 50 + i * 5, height: 30, depth: 20, weight: 100 }),
+      makeItem({
+        id: `p-${i}`,
+        sku: `P-${i}`,
+        width: 50 + i * 5,
+        height: 30,
+        depth: 20,
+        weight: 100,
+      }),
     );
     const box = makeBox();
     const start = performance.now();
@@ -280,7 +353,14 @@ describe('PackingEngine', () => {
   // Test 16: Performance - 30 items < 200ms
   it('should pack 30 items in under 200ms', () => {
     const items = Array.from({ length: 30 }, (_, i) =>
-      makeItem({ id: `p-${i}`, sku: `P-${i}`, width: 40 + (i % 5) * 10, height: 30, depth: 20, weight: 100 }),
+      makeItem({
+        id: `p-${i}`,
+        sku: `P-${i}`,
+        width: 40 + (i % 5) * 10,
+        height: 30,
+        depth: 20,
+        weight: 100,
+      }),
     );
     const box = makeBox({ innerWidth: 500, innerHeight: 500, innerDepth: 500 });
     const start = performance.now();
@@ -292,7 +372,14 @@ describe('PackingEngine', () => {
   // Test 17: Performance - 50 items < 500ms
   it('should pack 50 items in under 500ms', () => {
     const items = Array.from({ length: 50 }, (_, i) =>
-      makeItem({ id: `p-${i}`, sku: `P-${i}`, width: 30 + (i % 5) * 10, height: 25, depth: 20, weight: 80 }),
+      makeItem({
+        id: `p-${i}`,
+        sku: `P-${i}`,
+        width: 30 + (i % 5) * 10,
+        height: 25,
+        depth: 20,
+        weight: 80,
+      }),
     );
     const box = makeBox({ innerWidth: 600, innerHeight: 600, innerDepth: 600 });
     const start = performance.now();
@@ -304,9 +391,21 @@ describe('PackingEngine', () => {
   // Test 18: 50 identical items - no infinite loop
   it('should pack 50 identical items without infinite loop (< 2s)', () => {
     const items = Array.from({ length: 50 }, (_, i) =>
-      makeItem({ id: `dup-${i}`, sku: 'SAME-SKU', width: 50, height: 50, depth: 50, weight: 100 }),
+      makeItem({
+        id: `dup-${i}`,
+        sku: 'SAME-SKU',
+        width: 50,
+        height: 50,
+        depth: 50,
+        weight: 100,
+      }),
     );
-    const box = makeBox({ innerWidth: 500, innerHeight: 500, innerDepth: 500, maxWeight: 100000 });
+    const box = makeBox({
+      innerWidth: 500,
+      innerHeight: 500,
+      innerDepth: 500,
+      maxWeight: 100000,
+    });
     const start = performance.now();
     const result = packItems(items, box);
     const elapsed = performance.now() - start;
@@ -326,7 +425,9 @@ describe('PackingEngine', () => {
 
   // Test 20: Very thin item (0.5mm depth)
   it('should pack an item with 0.5mm depth correctly', () => {
-    const items = [makeItem({ width: 100, height: 50, depth: 0.5, weight: 10 })];
+    const items = [
+      makeItem({ width: 100, height: 50, depth: 0.5, weight: 10 }),
+    ];
     const box = makeBox();
     const result = packItems(items, box);
 
@@ -337,7 +438,14 @@ describe('PackingEngine', () => {
   // Test 21: No negative coordinates
   it('should never produce negative placement coordinates', () => {
     const items = Array.from({ length: 8 }, (_, i) =>
-      makeItem({ id: `neg-${i}`, sku: `NEG-${i}`, width: 60, height: 40, depth: 30, weight: 200 }),
+      makeItem({
+        id: `neg-${i}`,
+        sku: `NEG-${i}`,
+        width: 60,
+        height: 40,
+        depth: 30,
+        weight: 200,
+      }),
     );
     const box = makeBox();
     const result = packItems(items, box);
@@ -352,7 +460,14 @@ describe('PackingEngine', () => {
   // Test 22: No placement extends beyond box inner dimensions
   it('should not place items extending beyond box boundaries', () => {
     const items = Array.from({ length: 8 }, (_, i) =>
-      makeItem({ id: `bd-${i}`, sku: `BD-${i}`, width: 60, height: 40, depth: 30, weight: 200 }),
+      makeItem({
+        id: `bd-${i}`,
+        sku: `BD-${i}`,
+        width: 60,
+        height: 40,
+        depth: 30,
+        weight: 200,
+      }),
     );
     const box = makeBox();
     const result = packItems(items, box);

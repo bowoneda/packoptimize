@@ -1,4 +1,7 @@
-import { calculateDimWeight, calculateBillableWeight } from '../dim-weight-calculator';
+import {
+  calculateDimWeight,
+  calculateBillableWeight,
+} from '../dim-weight-calculator';
 
 describe('DimWeightCalculator', () => {
   // Test 23: FedEx 12x12x12 inch box
@@ -66,8 +69,12 @@ describe('DimWeightCalculator', () => {
   it('should sort dimensions so length >= width >= height', () => {
     // Give dimensions in scrambled order
     const result = calculateDimWeight(200, 500, 300, 'FEDEX', 139);
-    expect(result.roundedDims.length).toBeGreaterThanOrEqual(result.roundedDims.width);
-    expect(result.roundedDims.width).toBeGreaterThanOrEqual(result.roundedDims.height);
+    expect(result.roundedDims.length).toBeGreaterThanOrEqual(
+      result.roundedDims.width,
+    );
+    expect(result.roundedDims.width).toBeGreaterThanOrEqual(
+      result.roundedDims.height,
+    );
   });
 
   // Test 30: USPS exactly 1728 cu in -> exempt (threshold is <= 1728)

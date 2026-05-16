@@ -1,4 +1,10 @@
-import { Controller, Post, Req, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Req,
+  Logger,
+  BadRequestException,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
@@ -22,12 +28,13 @@ export class StripeWebhookController {
     private readonly configService: ConfigService,
   ) {
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    if (secretKey && secretKey !== 'sk_test_placeholder') {
+    if (secretKey && secretKey.startsWith('sk_')) {
       this.stripe = new Stripe(secretKey);
     } else {
       this.stripe = null;
     }
-    this.webhookSecret = this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? '';
+    this.webhookSecret =
+      this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? '';
   }
 
   @Post('webhook')
@@ -50,9 +57,15 @@ export class StripeWebhookController {
 
     let event: Stripe.Event;
     try {
-      event = this.stripe.webhooks.constructEvent(req.rawBody, sig, this.webhookSecret);
+      event = this.stripe.webhooks.constructEvent(
+        req.rawBody,
+        sig,
+        this.webhookSecret,
+      );
     } catch (err) {
-      this.logger.error(`Webhook signature verification failed: ${err instanceof Error ? err.message : err}`);
+      this.logger.error(
+        `Webhook signature verification failed: ${err instanceof Error ? err.message : err}`,
+      );
       throw new BadRequestException('Webhook signature verification failed');
     }
 

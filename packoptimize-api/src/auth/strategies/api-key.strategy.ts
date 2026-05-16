@@ -6,7 +6,10 @@ import { PrismaServiceWithoutTenant } from '../../prisma/prisma.service';
 import type { RequestUser } from '../../common/decorators/current-user.decorator';
 
 @Injectable()
-export class ApiKeyStrategy extends PassportStrategy(HeaderAPIKeyStrategy, 'headerapikey') {
+export class ApiKeyStrategy extends PassportStrategy(
+  HeaderAPIKeyStrategy,
+  'headerapikey',
+) {
   private readonly logger = new Logger(ApiKeyStrategy.name);
   private readonly prismaService: PrismaServiceWithoutTenant;
 

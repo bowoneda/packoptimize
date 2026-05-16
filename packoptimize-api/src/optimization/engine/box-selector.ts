@@ -8,7 +8,10 @@ import {
   UnpackedItem,
 } from './types';
 import { packItems } from './packing-engine';
-import { calculateDimWeight, calculateBillableWeight } from './dim-weight-calculator';
+import {
+  calculateDimWeight,
+  calculateBillableWeight,
+} from './dim-weight-calculator';
 import { validateCarrierConstraints } from './carrier-validator';
 import { calculateVoidFill } from './void-fill-calculator';
 import { generatePackInstructions } from './pack-instructor';
@@ -60,7 +63,10 @@ function buildPackedBox(
     carrierRules.dimDivisor,
   );
 
-  const billableResult = calculateBillableWeight(totalWeight, dimResult.dimWeightGrams);
+  const billableResult = calculateBillableWeight(
+    totalWeight,
+    dimResult.dimWeightGrams,
+  );
 
   // Validate carrier constraints
   const validation = validateCarrierConstraints(
@@ -91,7 +97,10 @@ function buildPackedBox(
   );
 
   // Calculate surcharge total
-  const surchargeTotal = validation.surcharges.reduce((s, sc) => s + sc.amount, 0);
+  const surchargeTotal = validation.surcharges.reduce(
+    (s, sc) => s + sc.amount,
+    0,
+  );
 
   const totalCost = box.cost + surchargeTotal + voidFill.fillCostUsd;
 
@@ -215,7 +224,10 @@ export function selectOptimalBoxes(
   const allItems = [...expandedItems, ...insertItems];
 
   // 3. Resolve compatibility groups
-  const { groups } = resolveCompatibilityGroups(allItems, options.compatibilityRules);
+  const { groups } = resolveCompatibilityGroups(
+    allItems,
+    options.compatibilityRules,
+  );
 
   // Sort boxes by inner volume ASC
   const sortedBoxes = [...availableBoxes].sort(
@@ -509,9 +521,15 @@ function packMultiBox(
   const individualCost = individualBoxes.reduce((s, b) => s + b.totalCost, 0);
 
   // Pick cheapest strategy
-  if (greedyCost <= individualCost && greedy.unpackedItems.length <= individual.unpackedItems.length) {
+  if (
+    greedyCost <= individualCost &&
+    greedy.unpackedItems.length <= individual.unpackedItems.length
+  ) {
     return { packedBoxes: greedyBoxes, unpackedItems: greedy.unpackedItems };
   }
 
-  return { packedBoxes: individualBoxes, unpackedItems: individual.unpackedItems };
+  return {
+    packedBoxes: individualBoxes,
+    unpackedItems: individual.unpackedItems,
+  };
 }

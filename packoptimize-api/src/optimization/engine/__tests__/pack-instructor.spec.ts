@@ -42,7 +42,12 @@ describe('PackInstructor', () => {
     ];
     const voidFill = makeVoidFill();
 
-    const instructions = generatePackInstructions(placements, 'Test Box', voidFill, 'AIR_PILLOWS');
+    const instructions = generatePackInstructions(
+      placements,
+      'Test Box',
+      voidFill,
+      'AIR_PILLOWS',
+    );
 
     // At least 2 placement steps + closing step
     expect(instructions.length).toBeGreaterThanOrEqual(placements.length);
@@ -55,7 +60,12 @@ describe('PackInstructor', () => {
     ];
     const voidFill = makeVoidFill();
 
-    const instructions = generatePackInstructions(placements, 'Test Box', voidFill, 'AIR_PILLOWS');
+    const instructions = generatePackInstructions(
+      placements,
+      'Test Box',
+      voidFill,
+      'AIR_PILLOWS',
+    );
 
     const fragileInstruction = instructions.find((i) =>
       i.toLowerCase().includes('fragile'),
@@ -74,10 +84,16 @@ describe('PackInstructor', () => {
       voidVolumeCubicIn: 1220,
     });
 
-    const instructions = generatePackInstructions(placements, 'Test Box', voidFill, 'KRAFT_PAPER');
+    const instructions = generatePackInstructions(
+      placements,
+      'Test Box',
+      voidFill,
+      'KRAFT_PAPER',
+    );
 
     const fillInstruction = instructions.find(
-      (i) => i.includes('void') || i.includes('Fill') || i.includes('kraft paper'),
+      (i) =>
+        i.includes('void') || i.includes('Fill') || i.includes('kraft paper'),
     );
     expect(fillInstruction).toBeDefined();
   });
@@ -87,7 +103,12 @@ describe('PackInstructor', () => {
     const placements = [makePlacement()];
     const voidFill = makeVoidFill();
 
-    const instructions = generatePackInstructions(placements, 'Test Box', voidFill, 'AIR_PILLOWS');
+    const instructions = generatePackInstructions(
+      placements,
+      'Test Box',
+      voidFill,
+      'AIR_PILLOWS',
+    );
 
     const lastInstruction = instructions[instructions.length - 1];
     expect(lastInstruction.toLowerCase()).toMatch(/close|seal/);

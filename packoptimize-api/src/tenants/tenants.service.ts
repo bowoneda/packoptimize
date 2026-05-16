@@ -20,7 +20,10 @@ export class TenantsService {
     });
   }
 
-  async update(tenantId: string, data: { name?: string; settings?: Prisma.InputJsonValue }) {
+  async update(
+    tenantId: string,
+    data: { name?: string; settings?: Prisma.InputJsonValue },
+  ) {
     return this.prisma.withTenantContext(async (tx) => {
       return tx.tenant.update({
         where: { id: tenantId },

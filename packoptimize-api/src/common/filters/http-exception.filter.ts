@@ -1,5 +1,13 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Response } from 'express';
+import * as Sentry from '@sentry/nestjs';
 
 @Catch()
 export class HttpExceptionFilter implements ExceptionFilter {
@@ -18,14 +26,21 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const exceptionResponse = exception.getResponse();
       if (typeof exceptionResponse === 'string') {
         message = exceptionResponse;
-      } else if (typeof exceptionResponse === 'object' && exceptionResponse !== null) {
+      } else if (
+        typeof exceptionResponse === 'object' &&
+        exceptionResponse !== null
+      ) {
         const resp = exceptionResponse as Record<string, unknown>;
         message = (resp['message'] as string) || message;
         error = (resp['error'] as string) || error;
       }
       error = exception.name || error;
     } else if (exception instanceof Error) {
-      this.logger.error(`Unhandled exception: ${exception.message}`, exception.stack);
+      this.logger.error(
+        `Unhandled exception: ${exception.message}`,
+        exception.stack,
+      );
+      Sentry.captureException(exception);
       message = exception.message;
     }
 

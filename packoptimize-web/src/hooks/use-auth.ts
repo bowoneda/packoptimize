@@ -7,7 +7,7 @@ import api from "@/lib/api";
 import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } from "@/types/api";
 
 export function useAuth() {
-  const { token, user, isAuthenticated, login: storeLogin, logout: storeLogout, initialize } = useAuthStore();
+  const { user, isAuthenticated, login: storeLogin, logout: storeLogout, initialize } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -16,20 +16,21 @@ export function useAuth() {
 
   const login = async (data: LoginRequest) => {
     const res = await api.post<LoginResponse>("/auth/login", data);
-    storeLogin(res.data.accessToken, res.data.user);
+    storeLogin(res.data.user);
     router.push("/dashboard");
   };
 
   const register = async (data: RegisterRequest) => {
     const res = await api.post<RegisterResponse>("/auth/register", data);
-    storeLogin(res.data.accessToken, res.data.user);
+    storeLogin(res.data.user);
     router.push("/dashboard");
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await api.post("/auth/logout").catch(() => {});
     storeLogout();
     router.push("/login");
   };
 
-  return { token, user, isAuthenticated, login, register, logout };
+  return { user, isAuthenticated, login, register, logout };
 }

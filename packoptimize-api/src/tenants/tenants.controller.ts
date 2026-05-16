@@ -1,5 +1,10 @@
 import { Controller, Get, Put, Body } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import type { Prisma } from '@prisma/client';
 import { TenantsService } from './tenants.service';
 import { CurrentTenant } from '../common/decorators/current-tenant.decorator';

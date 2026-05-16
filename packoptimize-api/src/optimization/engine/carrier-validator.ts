@@ -147,10 +147,7 @@ export function validateCarrierConstraints(
 
   // 8. AHS minimum billable weight
   let adjustedBillableWeight: number | null = null;
-  if (
-    ahsSurcharges.length > 0 &&
-    carrierRules.ahsMinBillableWeight !== null
-  ) {
+  if (ahsSurcharges.length > 0 && carrierRules.ahsMinBillableWeight !== null) {
     adjustedBillableWeight = carrierRules.ahsMinBillableWeight * GRAMS_PER_LB;
   }
 

@@ -1,5 +1,10 @@
 import { Body, Controller, Post, Res } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import type { Response } from 'express';
 import { OptimizationService } from './optimization.service';
 import { OptimizeRequestDto } from './dto/optimize-request.dto';
@@ -17,7 +22,11 @@ export class OptimizationController {
 
   @Post('optimize')
   @ApiOperation({ summary: 'Run packing optimization for a set of items' })
-  @ApiResponse({ status: 200, description: 'Optimization result', type: OptimizeResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Optimization result',
+    type: OptimizeResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Invalid request' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @ApiResponse({ status: 404, description: 'Items or box types not found' })
@@ -33,7 +42,10 @@ export class OptimizationController {
       request,
     );
 
-    res.setHeader('X-Optimization-Duration-Ms', result.executionTimeMs.toString());
+    res.setHeader(
+      'X-Optimization-Duration-Ms',
+      result.executionTimeMs.toString(),
+    );
 
     return result;
   }
@@ -46,6 +58,10 @@ export class OptimizationController {
     @CurrentTenant() tenantId: string,
     @CurrentUser() user: RequestUser,
   ) {
-    return this.optimizationService.batchOptimize(tenantId, user?.userId ?? null, request);
+    return this.optimizationService.batchOptimize(
+      tenantId,
+      user?.userId ?? null,
+      request,
+    );
   }
 }

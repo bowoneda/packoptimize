@@ -1,5 +1,22 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, ParseUUIDPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  Query,
+  ParseUUIDPipe,
+  ParseIntPipe,
+  DefaultValuePipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { ItemsService } from './items.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
@@ -24,15 +41,22 @@ export class ItemsController {
   @Get()
   @ApiOperation({ summary: 'Get all items for the current tenant' })
   @ApiResponse({ status: 200, description: 'List of items' })
-  async findAll(@CurrentTenant() tenantId: string) {
-    return this.itemsService.findAll(tenantId);
+  async findAll(
+    @CurrentTenant() tenantId: string,
+    @Query('limit', new DefaultValuePipe(500), ParseIntPipe) limit: number,
+    @Query('offset', new DefaultValuePipe(0), ParseIntPipe) offset: number,
+  ) {
+    return this.itemsService.findAll(tenantId, limit, offset);
   }
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a single item by ID' })
   @ApiResponse({ status: 200, description: 'Item found' })
   @ApiResponse({ status: 404, description: 'Item not found' })
-  async findOne(@CurrentTenant() tenantId: string, @Param('id', ParseUUIDPipe) id: string) {
+  async findOne(
+    @CurrentTenant() tenantId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.itemsService.findOne(tenantId, id);
   }
 
@@ -54,7 +78,10 @@ export class ItemsController {
   @ApiOperation({ summary: 'Delete an item' })
   @ApiResponse({ status: 200, description: 'Item deleted' })
   @ApiResponse({ status: 404, description: 'Item not found' })
-  async remove(@CurrentTenant() tenantId: string, @Param('id', ParseUUIDPipe) id: string) {
+  async remove(
+    @CurrentTenant() tenantId: string,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
     return this.itemsService.remove(tenantId, id);
   }
 }

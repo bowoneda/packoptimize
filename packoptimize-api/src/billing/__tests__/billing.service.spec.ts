@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ConfigService } from '@nestjs/config';
 import { NotFoundException } from '@nestjs/common';
@@ -16,7 +17,9 @@ jest.mock('stripe', () => {
   return jest.fn().mockImplementation(() => ({
     customers: { create: mockStripeCustomersCreate },
     checkout: { sessions: { create: mockStripeCheckoutSessionsCreate } },
-    billingPortal: { sessions: { create: mockStripeBillingPortalSessionsCreate } },
+    billingPortal: {
+      sessions: { create: mockStripeBillingPortalSessionsCreate },
+    },
     billing: { meterEvents: { create: mockStripeBillingMeterEventsCreate } },
     prices: { list: mockStripePricesList, retrieve: mockStripePricesRetrieve },
     webhooks: { constructEvent: jest.fn() },
@@ -90,7 +93,9 @@ describe('BillingService', () => {
   describe('checkPlanLimit', () => {
     it('should block FREE tenant at 100 usage', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantFree);
-      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { quantity: 100 } });
+      prisma.usageRecord.aggregate.mockResolvedValue({
+        _sum: { quantity: 100 },
+      });
 
       const result = await service.checkPlanLimit('tenant-1');
 
@@ -100,7 +105,9 @@ describe('BillingService', () => {
 
     it('should allow FREE tenant at 50 usage', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantFree);
-      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { quantity: 50 } });
+      prisma.usageRecord.aggregate.mockResolvedValue({
+        _sum: { quantity: 50 },
+      });
 
       const result = await service.checkPlanLimit('tenant-1');
 
@@ -119,14 +126,18 @@ describe('BillingService', () => {
     it('should throw NotFoundException for unknown tenant', async () => {
       prisma.tenant.findUnique.mockResolvedValue(null);
 
-      await expect(service.checkPlanLimit('nonexistent')).rejects.toThrow(NotFoundException);
+      await expect(service.checkPlanLimit('nonexistent')).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 
   describe('getUsage', () => {
     it('should return correct plan, limits, and usage for FREE tenant', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantFree);
-      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { quantity: 42 } });
+      prisma.usageRecord.aggregate.mockResolvedValue({
+        _sum: { quantity: 42 },
+      });
 
       const result = await service.getUsage('tenant-1');
 
@@ -139,7 +150,9 @@ describe('BillingService', () => {
 
     it('should calculate overage for STARTER tenant over limit', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantStarter);
-      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { quantity: 2050 } });
+      prisma.usageRecord.aggregate.mockResolvedValue({
+        _sum: { quantity: 2050 },
+      });
 
       const result = await service.getUsage('tenant-2');
 
@@ -152,7 +165,9 @@ describe('BillingService', () => {
 
     it('should return 0 usage when no records exist', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantFree);
-      prisma.usageRecord.aggregate.mockResolvedValue({ _sum: { quantity: null } });
+      prisma.usageRecord.aggregate.mockResolvedValue({
+        _sum: { quantity: null },
+      });
 
       const result = await service.getUsage('tenant-1');
 
@@ -182,7 +197,9 @@ describe('BillingService', () => {
 
       const result = await service.createCheckoutSession('tenant-1', 'STARTER');
 
-      expect(result.checkoutUrl).toBe('https://checkout.stripe.com/test_session');
+      expect(result.checkoutUrl).toBe(
+        'https://checkout.stripe.com/test_session',
+      );
       expect(mockStripeCheckoutSessionsCreate).toHaveBeenCalledWith(
         expect.objectContaining({
           customer: 'cus_new123',
@@ -269,9 +286,13 @@ describe('BillingService', () => {
 
     it('should not throw if Stripe call fails', async () => {
       prisma.tenant.findUnique.mockResolvedValue(mockTenantStarter);
-      mockStripeBillingMeterEventsCreate.mockRejectedValue(new Error('Stripe error'));
+      mockStripeBillingMeterEventsCreate.mockRejectedValue(
+        new Error('Stripe error'),
+      );
 
-      await expect(service.reportUsageToStripe('tenant-2')).resolves.not.toThrow();
+      await expect(
+        service.reportUsageToStripe('tenant-2'),
+      ).resolves.not.toThrow();
     });
   });
 });

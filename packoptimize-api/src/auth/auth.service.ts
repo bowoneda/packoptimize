@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  Logger,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaServiceWithoutTenant } from '../prisma/prisma.service';
@@ -56,7 +61,12 @@ export class AuthService {
       return { tenant, user };
     });
 
-    const token = this.generateToken(result.user.id, result.user.email, result.tenant.id, result.user.role);
+    const token = this.generateToken(
+      result.user.id,
+      result.user.email,
+      result.tenant.id,
+      result.user.role,
+    );
 
     return {
       accessToken: token,
@@ -92,7 +102,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const isPasswordValid = await bcrypt.compare(dto.password, user.passwordHash);
+    const isPasswordValid = await bcrypt.compare(
+      dto.password,
+      user.passwordHash,
+    );
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -116,7 +129,12 @@ export class AuthService {
     };
   }
 
-  private generateToken(userId: string, email: string, tenantId: string, role: string): string {
+  private generateToken(
+    userId: string,
+    email: string,
+    tenantId: string,
+    role: string,
+  ): string {
     return this.jwtService.sign({
       sub: userId,
       email,

@@ -1,14 +1,24 @@
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { ClsService } from 'nestjs-cls';
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(PrismaService.name);
 
   constructor(private readonly cls: ClsService) {
-    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    });
     super({ adapter });
   }
 
@@ -25,8 +35,10 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
    * Execute a callback within tenant context by setting the PostgreSQL session variable.
    * This enables RLS policies to filter data by tenant.
    */
-  async withTenantContext<T>(callback: (tx: PrismaClient) => Promise<T>): Promise<T> {
-    const tenantId = this.cls.get('TENANT_ID') as string | undefined;
+  async withTenantContext<T>(
+    callback: (tx: PrismaClient) => Promise<T>,
+  ): Promise<T> {
+    const tenantId = this.cls.get<string>('TENANT_ID');
     if (!tenantId) {
       return callback(this);
     }
@@ -43,11 +55,16 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
  * Used for operations that need to bypass RLS (e.g., API key lookups during auth).
  */
 @Injectable()
-export class PrismaServiceWithoutTenant extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaServiceWithoutTenant
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(PrismaServiceWithoutTenant.name);
 
   constructor() {
-    const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL,
+    });
     super({ adapter });
   }
 

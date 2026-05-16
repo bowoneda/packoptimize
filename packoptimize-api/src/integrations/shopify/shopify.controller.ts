@@ -11,7 +11,9 @@ export class ShopifyController {
   constructor(private readonly shopifyService: ShopifyService) {}
 
   @Post('rates')
-  @ApiOperation({ summary: 'Shopify Carrier Service — calculate optimized shipping rates' })
+  @ApiOperation({
+    summary: 'Shopify Carrier Service — calculate optimized shipping rates',
+  })
   async calculateRates(
     @CurrentTenant() tenantId: string,
     @Body() dto: ShopifyRateRequestDto,

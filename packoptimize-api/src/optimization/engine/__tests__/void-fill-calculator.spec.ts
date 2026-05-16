@@ -69,12 +69,28 @@ describe('VoidFillCalculator', () => {
   it('should calculate higher fill weight for KRAFT_PAPER than AIR_PILLOWS', () => {
     const boxMm = 304.8;
     const itemMm = 152.4;
-    const placements = [makePlacement({ width: itemMm, height: itemMm, depth: itemMm })];
+    const placements = [
+      makePlacement({ width: itemMm, height: itemMm, depth: itemMm }),
+    ];
 
-    const airResult = calculateVoidFill(boxMm, boxMm, boxMm, placements, 'AIR_PILLOWS');
-    const kraftResult = calculateVoidFill(boxMm, boxMm, boxMm, placements, 'KRAFT_PAPER');
+    const airResult = calculateVoidFill(
+      boxMm,
+      boxMm,
+      boxMm,
+      placements,
+      'AIR_PILLOWS',
+    );
+    const kraftResult = calculateVoidFill(
+      boxMm,
+      boxMm,
+      boxMm,
+      placements,
+      'KRAFT_PAPER',
+    );
 
-    expect(kraftResult.fillWeightGrams).toBeGreaterThan(airResult.fillWeightGrams);
+    expect(kraftResult.fillWeightGrams).toBeGreaterThan(
+      airResult.fillWeightGrams,
+    );
   });
 
   // Test 43: Fill cost calculation

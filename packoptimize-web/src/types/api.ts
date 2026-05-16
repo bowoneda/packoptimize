@@ -6,7 +6,6 @@ export interface LoginRequest {
 }
 
 export interface LoginResponse {
-  accessToken: string;
   user: {
     id: string;
     email: string;
@@ -24,7 +23,6 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-  accessToken: string;
   user: {
     id: string;
     email: string;

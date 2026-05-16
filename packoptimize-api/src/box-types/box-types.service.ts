@@ -17,11 +17,13 @@ export class BoxTypesService {
     });
   }
 
-  async findAll(tenantId: string) {
+  async findAll(tenantId: string, limit = 200, offset = 0) {
     return this.prisma.withTenantContext(async (tx) => {
       return tx.boxType.findMany({
         where: { tenantId },
         orderBy: { createdAt: 'desc' },
+        take: Math.min(limit, 500),
+        skip: offset,
       });
     });
   }

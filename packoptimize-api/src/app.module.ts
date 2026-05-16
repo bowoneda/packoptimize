@@ -58,7 +58,8 @@ import { RolesGuard } from './common/guards/roles.guard';
           lazyConnect: true,
           connectTimeout: 10000,
           maxRetriesPerRequest: 3,
-          retryStrategy: (times: number) => (times > 3 ? null : Math.min(times * 500, 3000)),
+          retryStrategy: (times: number) =>
+            times > 3 ? null : Math.min(times * 500, 3000),
         },
       }),
     }),

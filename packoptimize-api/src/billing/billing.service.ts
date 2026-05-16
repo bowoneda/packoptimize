@@ -31,19 +31,22 @@ export class BillingService {
     private readonly configService: ConfigService,
   ) {
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY');
-    if (secretKey && secretKey !== 'sk_test_placeholder') {
+    if (secretKey && secretKey.startsWith('sk_')) {
       this.stripe = new Stripe(secretKey);
     } else {
       this.stripe = null;
       this.logger.warn('Stripe is not configured — billing features disabled');
     }
-    this.frontendUrl = this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3001';
+    this.frontendUrl =
+      this.configService.get<string>('FRONTEND_URL') ?? 'http://localhost:3001';
   }
 
   async getOrCreateStripeCustomer(tenantId: string): Promise<string> {
     if (!this.stripe) throw new BadRequestException('Stripe is not configured');
 
-    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant) throw new NotFoundException('Tenant not found');
 
     if (tenant.stripeCustomerId) {
@@ -60,11 +63,16 @@ export class BillingService {
       data: { stripeCustomerId: customer.id },
     });
 
-    this.logger.log(`Created Stripe customer ${customer.id} for tenant ${tenantId}`);
+    this.logger.log(
+      `Created Stripe customer ${customer.id} for tenant ${tenantId}`,
+    );
     return customer.id;
   }
 
-  async createCheckoutSession(tenantId: string, plan: 'STARTER' | 'GROWTH'): Promise<{ checkoutUrl: string }> {
+  async createCheckoutSession(
+    tenantId: string,
+    plan: 'STARTER' | 'GROWTH',
+  ): Promise<{ checkoutUrl: string }> {
     if (!this.stripe) throw new BadRequestException('Stripe is not configured');
 
     const customerId = await this.getOrCreateStripeCustomer(tenantId);
@@ -76,11 +84,16 @@ export class BillingService {
       active: true,
     });
     const price = prices.data.find(
-      (p) => p.metadata?.plan === plan && p.type === 'recurring' && p.metadata?.type !== 'overage',
+      (p) =>
+        p.metadata?.plan === plan &&
+        p.type === 'recurring' &&
+        p.metadata?.type !== 'overage',
     );
 
     if (!price) {
-      throw new BadRequestException(`No Stripe price found for plan ${plan}. Run npm run stripe:setup first.`);
+      throw new BadRequestException(
+        `No Stripe price found for plan ${plan}. Run npm run stripe:setup first.`,
+      );
     }
 
     const session = await this.stripe.checkout.sessions.create({
@@ -98,9 +111,13 @@ export class BillingService {
   async createPortalSession(tenantId: string): Promise<{ portalUrl: string }> {
     if (!this.stripe) throw new BadRequestException('Stripe is not configured');
 
-    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant?.stripeCustomerId) {
-      throw new BadRequestException('No Stripe subscription found for this tenant');
+      throw new BadRequestException(
+        'No Stripe subscription found for this tenant',
+      );
     }
 
     const session = await this.stripe.billingPortal.sessions.create({
@@ -112,7 +129,9 @@ export class BillingService {
   }
 
   async getUsage(tenantId: string) {
-    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant) throw new NotFoundException('Tenant not found');
 
     const now = new Date();
@@ -142,8 +161,12 @@ export class BillingService {
     };
   }
 
-  async checkPlanLimit(tenantId: string): Promise<{ allowed: boolean; reason?: string }> {
-    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+  async checkPlanLimit(
+    tenantId: string,
+  ): Promise<{ allowed: boolean; reason?: string }> {
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant) throw new NotFoundException('Tenant not found');
 
     // Only FREE plan is hard-blocked
@@ -179,7 +202,9 @@ export class BillingService {
   async reportUsageToStripe(tenantId: string): Promise<void> {
     if (!this.stripe) return;
 
-    const tenant = await this.prisma.tenant.findUnique({ where: { id: tenantId } });
+    const tenant = await this.prisma.tenant.findUnique({
+      where: { id: tenantId },
+    });
     if (!tenant?.stripeCustomerId || tenant.plan === 'FREE') return;
 
     try {
@@ -193,14 +218,16 @@ export class BillingService {
       this.logger.debug(`Reported usage to Stripe for tenant ${tenantId}`);
     } catch (error) {
       // Don't let Stripe errors break the optimization flow
-      this.logger.error(`Failed to report usage to Stripe: ${error instanceof Error ? error.message : error}`);
+      this.logger.error(
+        `Failed to report usage to Stripe: ${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
   async handleWebhookEvent(event: Stripe.Event): Promise<void> {
     switch (event.type) {
       case 'checkout.session.completed': {
-        const session = event.data.object as Stripe.Checkout.Session;
+        const session = event.data.object;
         const tenantId = session.metadata?.tenantId;
         const plan = session.metadata?.plan;
 
@@ -219,7 +246,7 @@ export class BillingService {
       }
 
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object;
         const tenant = await this.prisma.tenant.findFirst({
           where: { stripeCustomerId: subscription.customer as string },
         });
@@ -233,7 +260,9 @@ export class BillingService {
                 where: { id: tenant.id },
                 data: { plan: plan as 'STARTER' | 'GROWTH' },
               });
-              this.logger.log(`Tenant ${tenant.id} subscription updated to ${plan}`);
+              this.logger.log(
+                `Tenant ${tenant.id} subscription updated to ${plan}`,
+              );
             }
           }
         }
@@ -241,7 +270,7 @@ export class BillingService {
       }
 
       case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object;
         const tenant = await this.prisma.tenant.findFirst({
           where: { stripeCustomerId: subscription.customer as string },
         });
@@ -250,18 +279,22 @@ export class BillingService {
             where: { id: tenant.id },
             data: { plan: 'FREE', stripeSubscriptionId: null },
           });
-          this.logger.log(`Tenant ${tenant.id} downgraded to FREE (subscription deleted)`);
+          this.logger.log(
+            `Tenant ${tenant.id} downgraded to FREE (subscription deleted)`,
+          );
         }
         break;
       }
 
       case 'invoice.payment_failed': {
-        const invoice = event.data.object as Stripe.Invoice;
+        const invoice = event.data.object;
         const tenant = await this.prisma.tenant.findFirst({
           where: { stripeCustomerId: invoice.customer as string },
         });
         if (tenant) {
-          this.logger.warn(`Payment failed for tenant ${tenant.id} (invoice ${invoice.id})`);
+          this.logger.warn(
+            `Payment failed for tenant ${tenant.id} (invoice ${invoice.id})`,
+          );
         }
         break;
       }

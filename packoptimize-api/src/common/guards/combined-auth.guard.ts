@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
@@ -20,9 +24,11 @@ export class CombinedAuthGuard extends AuthGuard(['jwt', 'headerapikey']) {
     return super.canActivate(context);
   }
 
-  handleRequest<TUser>(err: Error | null, user: TUser | false, info: Error | undefined): TUser {
+  handleRequest<TUser>(err: Error | null, user: TUser | false): TUser {
     if (err || !user) {
-      throw err || new UnauthorizedException('Invalid or missing authentication');
+      throw (
+        err || new UnauthorizedException('Invalid or missing authentication')
+      );
     }
     return user;
   }

@@ -21,7 +21,11 @@ export class ApiKeysService {
           userId,
           keyHash,
           keyPrefix,
-          permissions: dto.permissions ?? ['optimize', 'items:read', 'boxes:read'],
+          permissions: dto.permissions ?? [
+            'optimize',
+            'items:read',
+            'boxes:read',
+          ],
           expiresAt: dto.expiresAt ? new Date(dto.expiresAt) : null,
         },
       });

@@ -28,7 +28,7 @@ export class AnalyticsService {
           break;
       }
 
-      // Get all savings logs in period
+      // Get savings logs in period — hard cap at 10k rows
       const savingsLogs = await tx.savingsLog.findMany({
         where: {
           tenantId,
@@ -44,24 +44,25 @@ export class AnalyticsService {
           },
         },
         orderBy: { createdAt: 'asc' },
+        take: 10000,
       });
 
       // Summary
       const totalOptimizations = savingsLogs.length;
       const totalSavings = savingsLogs.reduce((s, l) => s + l.savingsAmount, 0);
       const totalNaive = savingsLogs.reduce((s, l) => s + l.naiveBoxCost, 0);
-      const averageSavingsPercent = totalNaive > 0
-        ? (totalSavings / totalNaive) * 100
-        : 0;
+      const averageSavingsPercent =
+        totalNaive > 0 ? (totalSavings / totalNaive) * 100 : 0;
 
       // Get optimization results for utilization
       const runIds = savingsLogs.map((l) => l.optimizationRunId);
-      const optimizationResults = runIds.length > 0
-        ? await tx.optimizationResult.findMany({
-            where: { optimizationRunId: { in: runIds } },
-            select: { optimizationRunId: true, utilization: true },
-          })
-        : [];
+      const optimizationResults =
+        runIds.length > 0
+          ? await tx.optimizationResult.findMany({
+              where: { optimizationRunId: { in: runIds } },
+              select: { optimizationRunId: true, utilization: true },
+            })
+          : [];
 
       const avgUtilByRun = new Map<string, number>();
       const runUtilGroups = new Map<string, number[]>();
@@ -71,19 +72,31 @@ export class AnalyticsService {
         runUtilGroups.set(r.optimizationRunId, arr);
       }
       for (const [runId, utils] of runUtilGroups) {
-        avgUtilByRun.set(runId, utils.reduce((a, b) => a + b, 0) / utils.length);
+        avgUtilByRun.set(
+          runId,
+          utils.reduce((a, b) => a + b, 0) / utils.length,
+        );
       }
 
       const totalBoxesUsed = optimizationResults.length;
-      const averageUtilization = avgUtilByRun.size > 0
-        ? [...avgUtilByRun.values()].reduce((a, b) => a + b, 0) / avgUtilByRun.size
-        : 0;
+      const averageUtilization =
+        avgUtilByRun.size > 0
+          ? [...avgUtilByRun.values()].reduce((a, b) => a + b, 0) /
+            avgUtilByRun.size
+          : 0;
 
       // Timeline (group by date)
-      const timelineMap = new Map<string, { optimizations: number; savings: number; utilizations: number[] }>();
+      const timelineMap = new Map<
+        string,
+        { optimizations: number; savings: number; utilizations: number[] }
+      >();
       for (const log of savingsLogs) {
         const date = log.createdAt.toISOString().split('T')[0];
-        const entry = timelineMap.get(date) ?? { optimizations: 0, savings: 0, utilizations: [] };
+        const entry = timelineMap.get(date) ?? {
+          optimizations: 0,
+          savings: 0,
+          utilizations: [],
+        };
         entry.optimizations++;
         entry.savings += log.savingsAmount;
         const util = avgUtilByRun.get(log.optimizationRunId);
@@ -95,30 +108,18 @@ export class AnalyticsService {
         date,
         optimizations: data.optimizations,
         savings: parseFloat(data.savings.toFixed(2)),
-        avgUtilization: data.utilizations.length > 0
-          ? parseFloat((data.utilizations.reduce((a, b) => a + b, 0) / data.utilizations.length).toFixed(4))
-          : 0,
+        avgUtilization:
+          data.utilizations.length > 0
+            ? parseFloat(
+                (
+                  data.utilizations.reduce((a, b) => a + b, 0) /
+                  data.utilizations.length
+                ).toFixed(4),
+              )
+            : 0,
       }));
 
-      // Top savings items — extract from run parameters
-      const itemSavings = new Map<string, { name: string; timesOptimized: number; totalSavings: number }>();
-      for (const log of savingsLogs) {
-        const params = log.optimizationRun?.parameters as Record<string, unknown> | null;
-        const itemCount = (params?.itemCount as number) ?? 1;
-        const perItemSavings = log.savingsAmount / itemCount;
-
-        // We track per-run, not per-item (we don't have per-item breakdown in savings)
-        const runKey = `run-${log.optimizationRunId}`;
-        if (!itemSavings.has(runKey)) {
-          itemSavings.set(runKey, {
-            name: `Optimization Run`,
-            timesOptimized: 1,
-            totalSavings: log.savingsAmount,
-          });
-        }
-      }
-
-      // Instead, return top runs by savings
+      // Top runs by savings
       const topSavingsItems = savingsLogs
         .filter((l) => l.savingsAmount > 0)
         .sort((a, b) => b.savingsAmount - a.savingsAmount)

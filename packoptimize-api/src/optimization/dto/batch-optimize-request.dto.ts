@@ -40,7 +40,10 @@ class BatchOrderDto {
 }
 
 export class BatchOptimizeRequestDto {
-  @ApiProperty({ type: [BatchOrderDto], description: 'Orders to optimize (max 100)' })
+  @ApiProperty({
+    type: [BatchOrderDto],
+    description: 'Orders to optimize (max 100)',
+  })
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(100)
@@ -53,16 +56,31 @@ export class BatchOptimizeRequestDto {
   @IsEnum(['FEDEX', 'UPS', 'USPS'])
   carrier?: string;
 
-  @ApiPropertyOptional({ enum: ['COST', 'SPACE', 'FEWEST_BOXES'], default: 'COST' })
+  @ApiPropertyOptional({
+    enum: ['COST', 'SPACE', 'FEWEST_BOXES'],
+    default: 'COST',
+  })
   @IsOptional()
   @IsEnum(['COST', 'SPACE', 'FEWEST_BOXES'])
   optimizeFor?: string;
 
   @ApiPropertyOptional({
-    enum: ['AIR_PILLOWS', 'KRAFT_PAPER', 'BUBBLE_WRAP', 'PACKING_PEANUTS', 'FOAM_IN_PLACE'],
+    enum: [
+      'AIR_PILLOWS',
+      'KRAFT_PAPER',
+      'BUBBLE_WRAP',
+      'PACKING_PEANUTS',
+      'FOAM_IN_PLACE',
+    ],
     default: 'AIR_PILLOWS',
   })
   @IsOptional()
-  @IsEnum(['AIR_PILLOWS', 'KRAFT_PAPER', 'BUBBLE_WRAP', 'PACKING_PEANUTS', 'FOAM_IN_PLACE'])
+  @IsEnum([
+    'AIR_PILLOWS',
+    'KRAFT_PAPER',
+    'BUBBLE_WRAP',
+    'PACKING_PEANUTS',
+    'FOAM_IN_PLACE',
+  ])
   fillMaterial?: string;
 }

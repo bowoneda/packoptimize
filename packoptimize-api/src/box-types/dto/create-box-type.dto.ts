@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNumber, IsBoolean, IsOptional, Min } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsBoolean,
+  IsOptional,
+  Min,
+} from 'class-validator';
 
 export class CreateBoxTypeDto {
   @ApiProperty({ example: 'Small Box', description: 'Box type name' })
@@ -46,17 +52,23 @@ export class CreateBoxTypeDto {
   @Min(0)
   boxWeight!: number;
 
-  @ApiProperty({ example: 10000, description: 'Maximum content weight in grams' })
+  @ApiProperty({
+    example: 10000,
+    description: 'Maximum content weight in grams',
+  })
   @IsNumber()
   @Min(0)
   maxWeight!: number;
 
-  @ApiProperty({ example: 0.50, description: 'Material cost of box in USD' })
+  @ApiProperty({ example: 0.5, description: 'Material cost of box in USD' })
   @IsNumber()
   @Min(0)
   cost!: number;
 
-  @ApiPropertyOptional({ example: true, description: 'Whether the box type is active' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Whether the box type is active',
+  })
   @IsBoolean()
   @IsOptional()
   isActive?: boolean;

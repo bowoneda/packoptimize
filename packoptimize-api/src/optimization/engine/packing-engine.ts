@@ -107,10 +107,7 @@ function checkStackingConstraint(
           )
           .reduce((sum, p) => sum + p.weight, 0);
 
-        if (
-          weightAbove + newItemWeight >
-          (existing as PlacementWithStack).maxStackWeight!
-        ) {
+        if (weightAbove + newItemWeight > existing.maxStackWeight) {
           return false;
         }
       }
@@ -208,9 +205,7 @@ export function packItems(
         }
 
         // Check stacking constraint
-        if (
-          !checkStackingConstraint(packed, item.weight, space.y)
-        ) {
+        if (!checkStackingConstraint(packed, item.weight, space.y)) {
           continue;
         }
 
@@ -302,7 +297,8 @@ export function packItems(
 
   // Strip maxStackWeight from the returned placements (not part of Placement interface)
   const cleanPacked: Placement[] = packed.map(
-    ({ maxStackWeight: _, ...rest }) => rest,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    ({ maxStackWeight: _msw, ...rest }) => rest,
   );
 
   return { packed: cleanPacked, unpacked, utilization };

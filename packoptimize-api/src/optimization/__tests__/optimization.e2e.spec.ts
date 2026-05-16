@@ -1,5 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return */
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const cookieParser = require('cookie-parser') as () => ReturnType<typeof import('cookie-parser')>;
 import request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -7,7 +10,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 describe('Optimization E2E (POST /v1/optimize)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
-  let swiftshipToken: string;
+  let swiftshipCookie: string;
   let swiftshipTenantId: string;
   let itemIds: string[];
 
@@ -17,6 +20,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
+    app.use(cookieParser());
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
@@ -38,13 +42,15 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
       })
       .expect(200);
 
-    swiftshipToken = loginRes.body.accessToken;
+    const rawCookies = loginRes.headers['set-cookie'] as string[] | string | undefined;
+    const cookieArr = Array.isArray(rawCookies) ? rawCookies : rawCookies ? [rawCookies] : [];
+    swiftshipCookie = cookieArr.map((c) => c.split(';')[0]).join('; ');
     swiftshipTenantId = loginRes.body.user.tenantId;
 
     // Get items for this tenant
     const itemsRes = await request(app.getHttpServer())
       .get('/items')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .expect(200);
 
     itemIds = itemsRes.body.map((i: { id: string }) => i.id);
@@ -58,7 +64,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should return 200 with complete OptimizationResult', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [
           { id: itemIds[0], quantity: 1 },
@@ -80,7 +86,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should include X-Optimization-Duration-Ms header > 0', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [{ id: itemIds[0], quantity: 1 }],
       })
@@ -95,7 +101,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should include detailed data in each packed box', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [{ id: itemIds[0], quantity: 1 }],
       })
@@ -114,7 +120,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should include voidFill data in each packed box', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [{ id: itemIds[0], quantity: 1 }],
       })
@@ -131,7 +137,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should include packInstructions array in each packed box', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [{ id: itemIds[0], quantity: 1 }],
       })
@@ -147,7 +153,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should include savingsAmount (naiveCost - optimizedCost)', async () => {
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: [
           { id: itemIds[0], quantity: 1 },
@@ -166,7 +172,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
   it('should return 400 for empty items array', async () => {
     await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({ items: [] })
       .expect(400);
   });
@@ -185,17 +191,25 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
     const billingPeriod = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     const beforeCount = await prisma.usageRecord.count({
-      where: { tenantId: swiftshipTenantId, type: 'OPTIMIZATION_RUN', billingPeriod },
+      where: {
+        tenantId: swiftshipTenantId,
+        type: 'OPTIMIZATION_RUN',
+        billingPeriod,
+      },
     });
 
     await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({ items: [{ id: itemIds[0], quantity: 1 }] })
       .expect(201);
 
     const afterCount = await prisma.usageRecord.count({
-      where: { tenantId: swiftshipTenantId, type: 'OPTIMIZATION_RUN', billingPeriod },
+      where: {
+        tenantId: swiftshipTenantId,
+        type: 'OPTIMIZATION_RUN',
+        billingPeriod,
+      },
     });
 
     expect(afterCount).toBeGreaterThan(beforeCount);
@@ -209,7 +223,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
 
     await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({ items: [{ id: itemIds[0], quantity: 1 }] })
       .expect(201);
 
@@ -237,7 +251,7 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
 
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: items.map((i) => ({ id: i.id, quantity: 1 })),
       })
@@ -245,18 +259,26 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
 
     // They should be in different boxes
     if (res.body.packedBoxes.length >= 2) {
-      const powerBankBoxes = res.body.packedBoxes.filter((b: { placements: Array<{ sku: string }> }) =>
-        b.placements.some((p: { sku: string }) => p.sku === 'SS-PWRBK-01'),
+      const powerBankBoxes = res.body.packedBoxes.filter(
+        (b: { placements: Array<{ sku: string }> }) =>
+          b.placements.some((p: { sku: string }) => p.sku === 'SS-PWRBK-01'),
       );
-      const candleBoxes = res.body.packedBoxes.filter((b: { placements: Array<{ sku: string }> }) =>
-        b.placements.some((p: { sku: string }) => p.sku === 'SS-CANDLE-01'),
+      const candleBoxes = res.body.packedBoxes.filter(
+        (b: { placements: Array<{ sku: string }> }) =>
+          b.placements.some((p: { sku: string }) => p.sku === 'SS-CANDLE-01'),
       );
 
       if (powerBankBoxes.length > 0 && candleBoxes.length > 0) {
         // Verify they're not in the same box
-        const powerBankBoxIndices = powerBankBoxes.map((b: { boxIndex: number }) => b.boxIndex);
-        const candleBoxIndices = candleBoxes.map((b: { boxIndex: number }) => b.boxIndex);
-        const overlap = powerBankBoxIndices.filter((i: number) => candleBoxIndices.includes(i));
+        const powerBankBoxIndices = powerBankBoxes.map(
+          (b: { boxIndex: number }) => b.boxIndex,
+        );
+        const candleBoxIndices = candleBoxes.map(
+          (b: { boxIndex: number }) => b.boxIndex,
+        );
+        const overlap = powerBankBoxIndices.filter((i: number) =>
+          candleBoxIndices.includes(i),
+        );
         expect(overlap).toHaveLength(0);
       }
     }
@@ -278,18 +300,20 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
 
     const res = await request(app.getHttpServer())
       .post('/v1/optimize')
-      .set('Authorization', `Bearer ${swiftshipToken}`)
+      .set('Cookie', swiftshipCookie)
       .send({
         items: items.map((i) => ({ id: i.id, quantity: 1 })),
       })
       .expect(201);
 
     // They should be in the same box
-    const phoneBox = res.body.packedBoxes.find((b: { placements: Array<{ sku: string }> }) =>
-      b.placements.some((p: { sku: string }) => p.sku === 'SS-PHONE-01'),
+    const phoneBox = res.body.packedBoxes.find(
+      (b: { placements: Array<{ sku: string }> }) =>
+        b.placements.some((p: { sku: string }) => p.sku === 'SS-PHONE-01'),
     );
-    const cableBox = res.body.packedBoxes.find((b: { placements: Array<{ sku: string }> }) =>
-      b.placements.some((p: { sku: string }) => p.sku === 'SS-USBC-01'),
+    const cableBox = res.body.packedBoxes.find(
+      (b: { placements: Array<{ sku: string }> }) =>
+        b.placements.some((p: { sku: string }) => p.sku === 'SS-USBC-01'),
     );
 
     if (phoneBox && cableBox) {
