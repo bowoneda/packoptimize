@@ -72,3 +72,108 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [test-api, test-frontend]
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: packoptimize
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: packoptimize_e2e
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://packoptimize:test_password@localhost:5433/packoptimize_e2e
+      JWT_SECRET: test-jwt-secret-e2e
+      REDIS_URL: redis://localhost:6379
+      NODE_ENV: test
+      FRONTEND_URL: http://localhost:3001
+      PORT: 3000
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            packoptimize-api/package-lock.json
+            packoptimize-web/package-lock.json
+
+      - name: Install API dependencies
+        run: npm ci
+        working-directory: packoptimize-api
+
+      - name: Generate Prisma client
+        run: npx prisma generate
+        working-directory: packoptimize-api
+
+      - name: Push database schema
+        run: npx prisma db push --skip-generate
+        working-directory: packoptimize-api
+
+      - name: Seed database
+        run: npx prisma db seed
+        working-directory: packoptimize-api
+
+      - name: Build API
+        run: npm run build
+        working-directory: packoptimize-api
+
+      - name: Start API
+        run: npm run start:prod &
+        working-directory: packoptimize-api
+
+      - name: Wait for API health check
+        run: |
+          echo "Waiting for API to be ready..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000/health; then
+              echo ""
+              echo "API is ready"
+              break
+            fi
+            echo "Attempt $i/30 — waiting 2s..."
+            sleep 2
+          done
+
+      - name: Install web dependencies
+        run: npm ci
+        working-directory: packoptimize-web
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+        working-directory: packoptimize-web
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        working-directory: packoptimize-web
+        env:
+          BASE_URL: http://localhost:3001
+          API_URL: http://localhost:3000
+
+      - name: Upload Playwright report
+        uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: packoptimize-web/playwright-report/
+          retention-days: 7
