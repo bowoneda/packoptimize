@@ -44,6 +44,7 @@ export class ApiKeyStrategy extends PassportStrategy(
       email: apiKeyRecord.user.email,
       tenantId: apiKeyRecord.tenantId,
       role: apiKeyRecord.user.role,
+      isSuperAdmin: false,
       permissions: apiKeyRecord.permissions,
     };
   }

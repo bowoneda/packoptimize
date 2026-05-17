@@ -270,7 +270,7 @@ describe('Security & Tenant Isolation', () => {
       .set('Cookie', tempCookie);
 
     expect(logoutRes.status).toBe(200);
-    const setCookieHeader = logoutRes.headers['set-cookie'] as
+    const setCookieHeader = logoutRes.headers['set-cookie'] as unknown as
       | string[]
       | undefined;
     if (setCookieHeader) {
