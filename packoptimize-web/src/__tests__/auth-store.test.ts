@@ -8,6 +8,7 @@ const mockUser: User = {
   role: "ADMIN",
   tenantId: "tenant-1",
   tenantName: "SwiftShip",
+  isSuperAdmin: false,
 };
 
 beforeEach(() => {

@@ -18,6 +18,7 @@ function makeUser(): User {
     role: "ADMIN",
     tenantId: "t1",
     tenantName: "Test Co",
+    isSuperAdmin: false,
   };
 }
 

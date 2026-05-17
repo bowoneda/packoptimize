@@ -122,7 +122,7 @@ export default function AdminTenantsPage() {
       <div className="rounded-2xl bg-white shadow-sm border border-[#E8EAED] overflow-hidden">
         {isLoading ? (
           <div className="p-5">
-            <TableSkeleton rows={6} cols={6} />
+            <TableSkeleton rows={6} />
           </div>
         ) : (
           <table className="w-full text-sm">
