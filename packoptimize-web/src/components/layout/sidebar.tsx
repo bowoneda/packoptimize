@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/auth-store";
 import {
   SquaresFour,
   Cube,
@@ -12,6 +13,7 @@ import {
   Key,
   Gear,
   Intersect,
+  ShieldCheck,
 } from "@phosphor-icons/react";
 
 const menuItems = [
@@ -29,6 +31,7 @@ const referenceItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { user } = useAuthStore();
 
   const renderNav = (items: typeof menuItems) =>
     items.map((item) => {
@@ -73,6 +76,33 @@ export function Sidebar() {
           <nav className="space-y-2">{renderNav(referenceItems)}</nav>
         </div>
       </div>
+
+      {/* Platform Admin — only visible to super admins */}
+      {user?.isSuperAdmin && (
+        <div className="pt-2 pb-2">
+          {(() => {
+            const isActive = pathname.startsWith("/admin");
+            return (
+              <Link
+                href="/admin"
+                className={cn(
+                  "flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-[#0B4228] text-white shadow-md"
+                    : "text-[#8B95A5] hover:text-[#0B4228] hover:bg-[#F5F6F8]"
+                )}
+              >
+                <ShieldCheck
+                  size={18}
+                  weight={isActive ? "fill" : "regular"}
+                  className={isActive ? "text-[#91E440]" : ""}
+                />
+                Platform Admin
+              </Link>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Settings — pinned to bottom */}
       <div className="pt-4 border-t border-[#E8EAED]">

@@ -80,6 +80,7 @@ model User {
   email        String
   passwordHash String
   role         Role      @default(OPERATOR)
+  isSuperAdmin Boolean   @default(false)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt

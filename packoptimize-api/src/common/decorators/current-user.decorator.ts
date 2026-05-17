@@ -6,6 +6,7 @@ export interface RequestUser {
   email: string;
   tenantId: string;
   role: string;
+  isSuperAdmin: boolean;
   permissions?: string[];
 }
 

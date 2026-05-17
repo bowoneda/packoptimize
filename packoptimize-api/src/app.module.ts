@@ -18,6 +18,7 @@ import { OptimizationModule } from './optimization/optimization.module';
 import { BillingModule } from './billing/billing.module';
 import { IntegrationsModule } from './integrations/integrations.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { AdminModule } from './admin/admin.module';
 
 import { CombinedAuthGuard } from './common/guards/combined-auth.guard';
 import { TenantGuard } from './common/guards/tenant.guard';
@@ -75,6 +76,7 @@ import { RolesGuard } from './common/guards/roles.guard';
     BillingModule,
     IntegrationsModule,
     AnalyticsModule,
+    AdminModule,
   ],
   providers: [
     {

@@ -22,7 +22,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "stripe:setup": "ts-node scripts/stripe-setup.ts",
-    "seed:demo": "ts-node prisma/seed-demo-history.ts"
+    "seed:demo": "ts-node prisma/seed-demo-history.ts",
+    "seed:admin": "ts-node prisma/seed-super-admin.ts"
   },
   "dependencies": {
     "@golevelup/nestjs-stripe": "^1.2.0",

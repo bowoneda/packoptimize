@@ -18,6 +18,7 @@ export interface AuthResponse {
     role: string;
     tenantId: string;
     tenantName: string;
+    isSuperAdmin: boolean;
   };
 }
 
@@ -66,6 +67,7 @@ export class AuthService {
       result.user.email,
       result.tenant.id,
       result.user.role,
+      result.user.isSuperAdmin,
     );
 
     return {
@@ -76,6 +78,7 @@ export class AuthService {
         role: result.user.role,
         tenantId: result.tenant.id,
         tenantName: result.tenant.name,
+        isSuperAdmin: result.user.isSuperAdmin,
       },
     };
   }
@@ -115,7 +118,17 @@ export class AuthService {
       data: { lastLoginAt: new Date() },
     });
 
-    const token = this.generateToken(user.id, user.email, tenant.id, user.role);
+    const token = this.generateToken(
+      user.id,
+      user.email,
+      tenant.id,
+      user.role,
+      user.isSuperAdmin,
+    );
+
+    if (!tenant.isActive) {
+      throw new UnauthorizedException('Account suspended');
+    }
 
     return {
       accessToken: token,
@@ -125,6 +138,7 @@ export class AuthService {
         role: user.role,
         tenantId: tenant.id,
         tenantName: tenant.name,
+        isSuperAdmin: user.isSuperAdmin,
       },
     };
   }
@@ -134,12 +148,14 @@ export class AuthService {
     email: string,
     tenantId: string,
     role: string,
+    isSuperAdmin: boolean,
   ): string {
     return this.jwtService.sign({
       sub: userId,
       email,
       tenantId,
       role,
+      isSuperAdmin,
     });
   }
 }

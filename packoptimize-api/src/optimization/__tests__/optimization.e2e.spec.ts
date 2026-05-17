@@ -2,7 +2,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const cookieParser = require('cookie-parser') as () => ReturnType<typeof import('cookie-parser')>;
+const cookieParser = require('cookie-parser') as () => ReturnType<
+  typeof import('cookie-parser')
+>;
 import request from 'supertest';
 import { AppModule } from '../../app.module';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -42,8 +44,15 @@ describe('Optimization E2E (POST /v1/optimize)', () => {
       })
       .expect(200);
 
-    const rawCookies = loginRes.headers['set-cookie'] as string[] | string | undefined;
-    const cookieArr = Array.isArray(rawCookies) ? rawCookies : rawCookies ? [rawCookies] : [];
+    const rawCookies = loginRes.headers['set-cookie'] as
+      | string[]
+      | string
+      | undefined;
+    const cookieArr = Array.isArray(rawCookies)
+      ? rawCookies
+      : rawCookies
+        ? [rawCookies]
+        : [];
     swiftshipCookie = cookieArr.map((c) => c.split(';')[0]).join('; ');
     swiftshipTenantId = loginRes.body.user.tenantId;
 

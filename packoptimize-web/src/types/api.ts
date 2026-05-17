@@ -12,6 +12,7 @@ export interface LoginResponse {
     role: string;
     tenantId: string;
     tenantName: string;
+    isSuperAdmin: boolean;
   };
 }
 
@@ -29,6 +30,7 @@ export interface RegisterResponse {
     role: string;
     tenantId: string;
     tenantName: string;
+    isSuperAdmin: boolean;
   };
 }
 
@@ -38,6 +40,7 @@ export interface User {
   role: string;
   tenantId: string;
   tenantName: string;
+  isSuperAdmin: boolean;
 }
 
 // Items
@@ -285,4 +288,58 @@ export interface InsertMaterial {
   depth: number;
   weight: number;
   alwaysInclude: boolean;
+}
+
+// Admin (super admin only)
+export interface AdminTenantSummary {
+  id: string;
+  name: string;
+  slug: string;
+  plan: string;
+  isActive: boolean;
+  createdAt: string;
+  _count: {
+    users: number;
+    items: number;
+    optimizationRuns: number;
+    apiKeys: number;
+  };
+}
+
+export interface AdminTenantUser {
+  id: string;
+  email: string;
+  role: string;
+  isSuperAdmin: boolean;
+  lastLoginAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminTenantDetail {
+  id: string;
+  name: string;
+  slug: string;
+  plan: string;
+  isActive: boolean;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  _count: {
+    users: number;
+    items: number;
+    optimizationRuns: number;
+    apiKeys: number;
+  };
+  users: AdminTenantUser[];
+  dailyRuns: { date: string; count: number }[];
+  totalSavings: number;
+}
+
+export interface PlatformStats {
+  tenantCount: number;
+  userCount: number;
+  completedOptimizationCount: number;
+  planBreakdown: Record<string, number>;
+  recentTenants: { id: string; name: string; plan: string; createdAt: string }[];
 }

@@ -10,11 +10,12 @@ interface JwtPayload {
   email: string;
   tenantId: string;
   role: string;
+  isSuperAdmin: boolean;
 }
 
 function fromCookie(req: Request): string | null {
   if (req.cookies && typeof req.cookies['access_token'] === 'string') {
-    return req.cookies['access_token'] as string;
+    return req.cookies['access_token'];
   }
   return null;
 }
@@ -45,6 +46,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
       email: payload.email,
       tenantId: payload.tenantId,
       role: payload.role,
+      isSuperAdmin: payload.isSuperAdmin ?? false,
     };
   }
 }
